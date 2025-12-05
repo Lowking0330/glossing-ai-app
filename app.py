@@ -2,8 +2,7 @@ import streamlit as st
 import google.generativeai as genai
 
 # 設定網頁標題與介面
-st.set_page_config(page_title="太魯閣語語法標註助手", page_icon="🏔️", layout="wide") 
-# layout="wide" 可以讓表格有更多空間顯示
+st.set_page_config(page_title="太魯閣語語法標註助手", page_icon="🏔️", layout="wide")
 
 st.title("🏔️ 太魯閣語自動語法標註系統")
 st.markdown("依據**《太魯閣語語法概論》**體系進行分析，並透過表格精準對齊。")
@@ -13,13 +12,12 @@ with st.sidebar:
     st.header("設定")
     api_key = st.text_input("輸入 Google AI API Key", type="password")
     st.markdown("[如何取得 Google API Key?](https://aistudio.google.com/app/apikey)")
-    st.info("本工具使用 Gemini-1.5-Flash 模型。")
+    st.info("本工具使用 Gemini-2.0-Flash 模型。")
 
 # 主輸入區
 truku_input = st.text_area("請輸入太魯閣語句子：", height=100, placeholder="例如：Mkla su rmngaw kari Truku hug?")
 
-# --- 這裡是最重要的修改 ---
-# 我們教 AI 輸出 Markdown 表格，這樣網頁渲染時就會自動對齊
+# 定義語法規則 System Prompt
 grammar_rules = """
 你是一位專精於《太魯閣語語法概論》(2018, 李佩容/許韋晟) 的語言學家。
 請針對使用者的輸入進行分析，特別注意「對齊」格式。
@@ -46,7 +44,7 @@ Mkla su rmngaw kari Truku hug?
 ### 詞法分析表 (第二、三行對齊)
 | me-kela=su | r<m>engag | kari | Truku | hug |
 | :--- | :--- | :--- | :--- | :--- |
-| 主事焦點-會=你.主格 | <主事焦點>說 | 話/語言 | 太魯閣 | 疑問助詞 |
+| 主事焦點-會=你.主格 | <主事焦點>說 | 話 | 太魯閣 | 助詞 |
 
 ### 第四行：中文翻譯
 (請在此輸入中文翻譯)
@@ -59,32 +57,17 @@ if st.button("開始標註分析", type="primary"):
     elif not truku_input:
         st.warning("請輸入句子！")
     else:
+        # --- 3. 初始化 Google Gemini (您修改的部分) ---
         try:
-            # 設定 Google Gemini
-            genai.configure(api_key="AIzaSyBZKeQqqYvKfV6y4igQExIjOxN-U_mA8eM")
-            
-            # 改回最穩定的 1.5 Flash 版本
-            model = genai.GenerativeModel('gemini-1.5-flash')
-            
-            with st.spinner('正在進行結構對齊分析...'):
-                full_prompt = f"{grammar_rules}\n\n使用者輸入句子：{truku_input}\n請依照範例格式輸出："
-                
-                response = model.generate_content(full_prompt)
-                result = response.text
-
-            # 顯示結果
-            # st.markdown 可以直接把 Markdown 表格渲染得很漂亮
-            st.markdown(result)
-            
-            st.success("分析完成！表格已自動對齊。")
-
+            genai.configure(api_key=api_key)
+            MODEL_VERSION = 'gemini-2.0-flash-001'  # 指定使用 2.0 Flash
+            model = genai.GenerativeModel(MODEL_VERSION)
         except Exception as e:
-            st.error(f"發生錯誤：{str(e)}")
-            st.info("請檢查您的 API Key 是否正確。")
+            st.error(f"模型初始化失敗: {e}")
+            st.info("提示：如果顯示 404 錯誤，請確認您的 `google-generativeai` 套件已更新至最新版 (pip install --upgrade google-generativeai)。")
+            st.stop()
+        # ---------------------------------------------
 
-# 頁尾
-st.markdown("---")
-st.caption("規則依據：原住民族委員會《太魯閣語語法概論》 | Powered by Google Gemini")
-
-
-
+        try:
+            with st.spinner(f'正在使用 {MODEL_VERSION} 進行結構對齊分析...'):
+                full_prompt = f"{grammar_rules}\n\
