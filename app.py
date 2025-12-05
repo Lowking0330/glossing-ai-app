@@ -63,9 +63,8 @@ if st.button("開始標註分析", type="primary"):
         try:
             # 設定 Google Gemini
             genai.configure(api_key="AIzaSyBZKeQqqYvKfV6y4igQExIjOxN-U_mA8eM")
-            
-            # 使用 gemini-3.0-flash，速度快且對指令遵循度高
-            model = genai.GenerativeModel('gemini-3.0-flash')
+            MODEL_VERSION = 'gemini-2.0-flash-001'
+            model = genai.GenerativeModel(MODEL_VERSION)
             
             with st.spinner('正在調閱《太魯閣語語法概論》規則進行分析...'):
                 # 組合 Prompt
@@ -88,4 +87,5 @@ if st.button("開始標註分析", type="primary"):
 st.markdown("---")
 
 st.caption("規則依據：原住民族委員會《太魯閣語語法概論》 | Powered by Google Gemini")
+
 
