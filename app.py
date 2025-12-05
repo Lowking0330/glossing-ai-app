@@ -57,10 +57,19 @@ if st.button("開始標註分析", type="primary"):
     elif not truku_input:
         st.warning("請輸入句子！")
     else:
-        # --- 3. 初始化 Google Gemini (您修改的部分) ---
-try:
+        # --- 3. 初始化 Google Gemini ---
+        try:
+            genai.configure(api_key=api_key)
+            MODEL_VERSION = 'gemini-2.0-flash-001'
+            model = genai.GenerativeModel(MODEL_VERSION)
+        except Exception as e:
+            st.error(f"模型初始化失敗: {e}")
+            st.stop()
+        
+        # --- 開始生成內容 ---
+        try:
             with st.spinner(f'正在使用 {MODEL_VERSION} 進行結構對齊分析...'):
-                # 修改這裡：使用三個引號 f""" 來包住，避免斷行錯誤
+                # 使用三個引號 f""" 來包住，避免斷行錯誤
                 full_prompt = f"""{grammar_rules}
 
 使用者輸入句子：{truku_input}
@@ -78,3 +87,6 @@ try:
             st.error(f"生成過程中發生錯誤：{str(e)}")
             st.info("請檢查您的 API Key 是否正確，或是模型額度是否足夠。")
 
+# 頁尾
+st.markdown("---")
+st.caption("規則依據：原住民族委員會《太魯閣語語法概論》 | Powered by Google Gemini")
