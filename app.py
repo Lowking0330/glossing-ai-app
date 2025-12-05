@@ -61,7 +61,7 @@ if st.button("開始標註分析", type="primary"):
     else:
         try:
             # 設定 Google Gemini
-            genai.configure(api_key=api_key)
+            genai.configure(api_key="AIzaSyBZKeQqqYvKfV6y4igQExIjOxN-U_mA8eM")
             
             # 改回最穩定的 1.5 Flash 版本
             model = genai.GenerativeModel('gemini-1.5-flash')
@@ -85,5 +85,6 @@ if st.button("開始標註分析", type="primary"):
 # 頁尾
 st.markdown("---")
 st.caption("規則依據：原住民族委員會《太魯閣語語法概論》 | Powered by Google Gemini")
+
 
 
