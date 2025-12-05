@@ -13,13 +13,12 @@ with st.sidebar:
     st.header("設定")
     api_key = st.text_input("輸入 Google AI API Key", type="password")
     st.markdown("[如何取得 Google API Key?](https://aistudio.google.com/app/apikey)")
-    st.info("本工具使用 Gemini-1.5-Flash (JSON Mode)。")
+    st.info("本工具使用 Gemini-2.0-Flash (JSON Mode)。")
 
 # 主輸入區
 truku_input = st.text_area("請輸入太魯閣語句子：", height=100, placeholder="例如：Mkla su rmngaw kari Truku hug?")
 
 # --- 定義 JSON 格式的 System Prompt ---
-# 我們要求 AI 輸出 JSON，這樣我們才能自由控制排版，不受 Markdown 表格限制
 grammar_rules = """
 你是一位專精於《太魯閣語語法概論》(2018, 李佩容/許韋晟) 的語言學家。
 請針對使用者的輸入進行分析。
@@ -47,18 +46,20 @@ if st.button("開始標註分析", type="primary"):
     elif not truku_input:
         st.warning("請輸入句子！")
     else:
-        # --- 3. 初始化 Google Gemini ---
+        # --- 3. 初始化 Google Gemini (依照您的要求修正) ---
         try:
             genai.configure(api_key=api_key)
-            # 使用 1.5 Flash 並開啟 JSON 模式，保證格式絕對正確
-            model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"response_mime_type": "application/json"})
+            MODEL_VERSION = 'gemini-2.0-flash-001'
+            # 注意：為了讓排版對齊功能生效，這裡必須加上 generation_config
+            model = genai.GenerativeModel(MODEL_VERSION, generation_config={"response_mime_type": "application/json"})
         except Exception as e:
             st.error(f"模型初始化失敗: {e}")
             st.stop()
+        # -----------------------------------------------------
         
         # --- 開始生成內容 ---
         try:
-            with st.spinner('正在進行結構分析...'):
+            with st.spinner(f'正在使用 {MODEL_VERSION} 進行結構分析...'):
                 full_prompt = f"""{grammar_rules}
 
 使用者輸入句子：{truku_input}"""
@@ -75,13 +76,12 @@ if st.button("開始標註分析", type="primary"):
             st.markdown(f"**第一行：** {truku_input}")
             
             # 第二、三行：動態對齊區塊
-            # 這裡使用 Flexbox 排版，讓每一個「單字+標註」成為一個群組，自動排列
             html_content = """
             <style>
                 .gloss-container {
                     display: flex;
                     flex-wrap: wrap;
-                    gap: 15px; /* 單字之間的間距 */
+                    gap: 15px;
                     margin-bottom: 20px;
                     font-family: sans-serif;
                 }
@@ -91,18 +91,17 @@ if st.button("開始標註分析", type="primary"):
                 }
                 .gloss-base {
                     font-weight: bold;
-                    margin-bottom: 4px; /* 上下行之間的微小間距 */
-                    font-size: 1rem;    /* 字體大小跟第一行一致 */
+                    margin-bottom: 4px;
+                    font-size: 1rem;
                 }
                 .gloss-label {
                     color: #555;
-                    font-size: 1rem;    /* 字體大小跟第一行一致 */
+                    font-size: 1rem;
                 }
             </style>
             <div class="gloss-container">
             """
             
-            # 迴圈加入每個單字
             for item in result_json["words"]:
                 html_content += f"""
                 <div class="gloss-item">
@@ -113,18 +112,4 @@ if st.button("開始標註分析", type="primary"):
             
             html_content += "</div>"
             
-            # 顯示 HTML
-            st.markdown(html_content, unsafe_allow_html=True)
-            
-            # 第四行：翻譯
-            st.markdown(f"**第四行：** {result_json['translation']}")
-            
-            st.success("分析完成！")
-
-        except Exception as e:
-            st.error(f"發生錯誤：{str(e)}")
-            st.info("請檢查您的 API Key 是否正確。")
-
-# 頁尾
-st.markdown("---")
-st.caption("規則依據：原住民族委員會《太魯閣語語法概論》 | Powered by Google Gemini")
+            # 顯示
