@@ -38,16 +38,10 @@ grammar_rules = """
 - **特殊詞**：ka(主格標記), o(主題標記), ni(連接詞), hug(疑問助詞)。
 
 【輸出格式範例】
-### 第一行：原始句子
-Mkla su rmngaw kari Truku hug?
-
-### 詞法分析表 (第二、三行對齊)
-| me-kela=su | r<m>engag | kari | Truku | hug |
-| :--- | :--- | :--- | :--- | :--- |
-| 主事焦點-會=你.主格 | <主事焦點>說 | 話 | 太魯閣 | 助詞 |
-
-### 第四行：中文翻譯
-(請在此輸入中文翻譯)
+第一行：Mkla su rmngaw kari Truku hug?
+第二行：me-kela=su r<m>engag kari truku hug
+第三行：主事焦點-會/知道=你.主格 <主事焦點>說 話/語言 太魯閣 助詞
+第四行：(請在此輸入中文翻譯)
 """
 
 # 分析按鈕
@@ -87,3 +81,4 @@ if st.button("開始標註分析", type="primary"):
 # 頁尾
 st.markdown("---")
 st.caption("規則依據：原住民族委員會《太魯閣語語法概論》 | Powered by Google Gemini")
+
