@@ -58,16 +58,23 @@ if st.button("開始標註分析", type="primary"):
         st.warning("請輸入句子！")
     else:
         # --- 3. 初始化 Google Gemini (您修改的部分) ---
-        try:
-            genai.configure(api_key=api_key)
-            MODEL_VERSION = 'gemini-2.0-flash-001'  # 指定使用 2.0 Flash
-            model = genai.GenerativeModel(MODEL_VERSION)
-        except Exception as e:
-            st.error(f"模型初始化失敗: {e}")
-            st.info("提示：如果顯示 404 錯誤，請確認您的 `google-generativeai` 套件已更新至最新版 (pip install --upgrade google-generativeai)。")
-            st.stop()
-        # ---------------------------------------------
-
-        try:
+try:
             with st.spinner(f'正在使用 {MODEL_VERSION} 進行結構對齊分析...'):
-                full_prompt = f"{grammar_rules}\n\
+                # 修改這裡：使用三個引號 f""" 來包住，避免斷行錯誤
+                full_prompt = f"""{grammar_rules}
+
+使用者輸入句子：{truku_input}
+請依照範例格式輸出："""
+                
+                response = model.generate_content(full_prompt)
+                result = response.text
+
+            # 顯示結果
+            st.markdown(result)
+            
+            st.success("分析完成！表格已自動對齊。")
+
+        except Exception as e:
+            st.error(f"生成過程中發生錯誤：{str(e)}")
+            st.info("請檢查您的 API Key 是否正確，或是模型額度是否足夠。")
+
