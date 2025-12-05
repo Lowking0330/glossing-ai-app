@@ -63,8 +63,8 @@ if st.button("開始標註分析", type="primary"):
             # 設定 Google Gemini
             genai.configure(api_key=api_key)
             
-            # 使用 flash 模型速度最快
-            model = genai.GenerativeModel('gemini-1.5-flash')
+            # 注意：目前 2.0 還是實驗版，名稱通常有 -exp
+            model = genai.GenerativeModel('gemini-2.0-flash-exp')
             
             with st.spinner('正在進行結構對齊分析...'):
                 full_prompt = f"{grammar_rules}\n\n使用者輸入句子：{truku_input}\n請依照範例格式輸出："
@@ -85,3 +85,4 @@ if st.button("開始標註分析", type="primary"):
 # 頁尾
 st.markdown("---")
 st.caption("規則依據：原住民族委員會《太魯閣語語法概論》 | Powered by Google Gemini")
+
