@@ -60,4 +60,36 @@ if st.button("🚀 開始標註分析", type="primary"):
         
         try:
             genai.configure(api_key=api_key)
-            model = genai
+            model = genai.GenerativeModel(MODEL_ID)
+            
+            with st.spinner(f'正在呼叫 {MODEL_ID} 進行結構對齊分析...'):
+                full_prompt = f"{grammar_rules}\n\n使用者輸入句子：{truku_input}\n請輸出分析結果："
+                
+                # 發送請求
+                response = model.generate_content(full_prompt)
+                result = response.text
+
+            # 顯示結果
+            st.markdown("### 📊 分析結果")
+            st.markdown(result)
+            st.success("分析完成！")
+
+        except Exception as e:
+            # 針對 404 錯誤 (模型名稱錯誤) 做特別提示
+            error_msg = str(e)
+            st.error(f"❌ 發生錯誤：{error_msg}")
+            
+            if "404" in error_msg:
+                st.warning(
+                    f"⚠️ 找不到模型 `{MODEL_ID}`。\n\n"
+                    "可能原因：\n"
+                    "1. 您的 API Key 沒有權限存取此模型。\n"
+                    "2. Google 更改了模型名稱 (例如變成 `gemini-2.0-flash-exp`)。\n"
+                    "3. 請嘗試更新套件：`pip install -U google-generativeai`"
+                )
+            elif "400" in error_msg:
+                 st.warning("⚠️ API Key 無效，請檢查您的金鑰。")
+
+# --- 6. 頁尾 ---
+st.markdown("---")
+st.caption("規則依據：原住民族委員會《太魯閣語語法概論》 | Powered by Google Gemini")
