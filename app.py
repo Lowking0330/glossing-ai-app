@@ -112,4 +112,18 @@ if st.button("開始標註分析", type="primary"):
             
             html_content += "</div>"
             
-            # 顯示
+            # 顯示 HTML
+            st.markdown(html_content, unsafe_allow_html=True)
+            
+            # 第四行：翻譯
+            st.markdown(f"**第四行：** {result_json['translation']}")
+            
+            st.success("分析完成！")
+
+        except Exception as e:
+            st.error(f"發生錯誤：{str(e)}")
+            st.info("請檢查您的 API Key 是否正確。")
+
+# 頁尾
+st.markdown("---")
+st.caption("規則依據：原住民族委員會《太魯閣語語法概論》 | Powered by Google Gemini")
