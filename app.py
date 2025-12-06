@@ -49,12 +49,12 @@ with st.sidebar:
 def get_dictionary():
     return {
         # --- 新範例單字 ---
-        "mtalux": {"morph": "mtalux", "gloss": "熱", "meaning": "熱/燙"},
+        "mtalux": {"morph": "m-talux", "gloss": "主事焦點-熱", "meaning": "熱/燙"},
         "mring": {"morph": "mring", "gloss": "髒/汗", "meaning": "流汗/髒"},
         "bhangan": {"morph": "bhangan", "gloss": "聽", "meaning": "聽到/聽聞"},
         "meiyah": {"morph": "m-iyah", "gloss": "主事焦點-來", "meaning": "來(異體)"},
         "msa": {"morph": "msa", "gloss": "說", "meaning": "說/如此"},
-        "mlatat": {"morph": "m-latat", "gloss": "主事焦點-出", "meaning": "出門/出去"},
+        "mlatat": {"morph": "m-latat", "gloss": "主事焦點-出去", "meaning": "出門/出去"},
         "snguhi": {"morph": "snguh-i", "gloss": "忘記-祈使", "meaning": "忘記(別忘)"},
         # --- 原有單字 ---
         "tmkuy": {"morph": "t<m>kuy", "gloss": "<主事焦點>種", "meaning": "種植/播種"},
@@ -598,5 +598,6 @@ if st.button("開始分析", type="primary"):
 
 st.markdown("---")
 st.caption("資料來源參考：《太魯閣語語法概論》 | 設計用途：族語教學與語料保存")
+
 
 
