@@ -118,7 +118,7 @@ DICTIONARY = {
     "manu": {"morph": "manu", "gloss": "疑問詞", "meaning": "什麼"},
     "rudan": {"morph": "rudan", "gloss": "名詞", "meaning": "老人/祖先"},
     "kari": {"morph": "kari", "gloss": "名詞", "meaning": "話/語言"},
-    "truku": {"morph": "truku", "gloss": "專有名詞", "meaning": "太魯閣"},
+    "truku": {"morph": "Truku", "gloss": "專有名詞", "meaning": "太魯閣"},
     "qmpringan": {"morph": "qmpringan", "gloss": "名詞", "meaning": "團隊/基金會"},
     "snduray": {"morph": "snduray", "gloss": "名詞", "meaning": "最近"},
     "seejiq": {"morph": "seejiq", "gloss": "名詞", "meaning": "人"},
@@ -160,94 +160,151 @@ DICTIONARY = {
     "brunguy": {"morph": "brunguy", "gloss": "背籃", "meaning": "背籃"},
     "btunux": {"morph": "btunux", "gloss": "石頭", "meaning": "石頭"},
     "buwax": {"morph": "buwax", "gloss": "米", "meaning": "米(未煮)"},
+    "cicih": {"morph": "cicih", "gloss": "一點", "meaning": "一點點/少"},
+    "cimu": {"morph": "cimu", "gloss": "鹽", "meaning": "鹽"},
     "dara": {"morph": "dara", "gloss": "血", "meaning": "血"},
-    "elug": {"morph": "elug", "gloss": "路", "meaning": "道路"},
-    "empitu": {"morph": "empitu", "gloss": "七", "meaning": "七"},
-    "empusal": {"morph": "empusal", "gloss": "二十", "meaning": "二十"},
-    "gamil": {"morph": "gamil", "gloss": "根", "meaning": "根"},
-    "gbiyan": {"morph": "gbiyan", "gloss": "傍晚", "meaning": "傍晚"},
-    "hakaw": {"morph": "hakaw", "gloss": "橋", "meaning": "橋樑"},
-    "hangan": {"morph": "hangan", "gloss": "名字", "meaning": "名字"},
-    "hici": {"morph": "hici", "gloss": "以後", "meaning": "以後"},
-    "hidaw": {"morph": "hidaw", "gloss": "太陽", "meaning": "太陽"},
-    "hini": {"morph": "hini", "gloss": "這裡", "meaning": "這裡"},
-    "hngkawas": {"morph": "hngkawas", "gloss": "年", "meaning": "年/歲"},
-    "idaw": {"morph": "idaw", "gloss": "飯", "meaning": "飯"},
-    "jiyax": {"morph": "jiyax", "gloss": "日子", "meaning": "日子/時間"},
-    "karat": {"morph": "karat", "gloss": "天空", "meaning": "天空/天氣"},
-    "keeman": {"morph": "keeman", "gloss": "晚上", "meaning": "晚上"},
-    "kerig": {"morph": "kerig", "gloss": "苧麻", "meaning": "苧麻"},
-    "kingal": {"morph": "kingal", "gloss": "一", "meaning": "一"},
-    "lala": {"morph": "lala", "gloss": "多", "meaning": "很多"},
-    "laqi": {"morph": "laqi", "gloss": "小孩", "meaning": "小孩"},
-    "lukus": {"morph": "lukus", "gloss": "衣服", "meaning": "衣服"},
-    "lupung": {"morph": "lupung", "gloss": "朋友", "meaning": "朋友"},
-    "mangal": {"morph": "m-angal", "gloss": "AF-拿", "meaning": "拿取"},
-    "marig": {"morph": "m-arig", "gloss": "AF-買", "meaning": "買"},
-    "matas": {"morph": "m-atas", "gloss": "AF-寫", "meaning": "寫/讀書"},
-    "maxal": {"morph": "maxal", "gloss": "十", "meaning": "十"},
-    "mbanah": {"morph": "m-banah", "gloss": "AF-紅", "meaning": "紅色"},
-    "mdrumut": {"morph": "m-drumut", "gloss": "AF-勤勞", "meaning": "勤勞"},
-    "mirit": {"morph": "mirit", "gloss": "羊", "meaning": "羊"},
-    "mqaras": {"morph": "m-qaras", "gloss": "AF-樂", "meaning": "高興/快樂"},
-    "mrawa": {"morph": "m-rawa", "gloss": "AF-玩", "meaning": "玩耍"},
-    "msangay": {"morph": "m-sangay", "gloss": "AF-休", "meaning": "休息"},
-    "mtutuy": {"morph": "m-tutuy", "gloss": "AF-起", "meaning": "起床"},
-    "naqih": {"morph": "naqih", "gloss": "壞", "meaning": "不好/壞"},
-    "ngangut": {"morph": "ngangut", "gloss": "外面", "meaning": "外面"},
-    "paah": {"morph": "paah", "gloss": "從", "meaning": "從"},
-    "pada": {"morph": "pada", "gloss": "山羌", "meaning": "山羌"},
-    "pajiq": {"morph": "pajiq", "gloss": "菜", "meaning": "青菜"},
-    "papak": {"morph": "papak", "gloss": "腳", "meaning": "腳"},
-    "paru": {"morph": "paru", "gloss": "大", "meaning": "大"},
-    "patas": {"morph": "patas", "gloss": "書", "meaning": "書/信"},
-    "pila": {"morph": "pila", "gloss": "錢", "meaning": "錢"},
-    "piya": {"morph": "piya", "gloss": "多少", "meaning": "多少"},
-    "pndakar": {"morph": "p-en-dakar", "gloss": "叮嚀", "meaning": "叮嚀/囑咐"},
-    "prajing": {"morph": "prajing", "gloss": "開始", "meaning": "開始"},
-    "pratu": {"morph": "pratu", "gloss": "碗", "meaning": "碗"},
-    "qduriq": {"morph": "qduriq", "gloss": "逃", "meaning": "逃跑"},
-    "qempah": {"morph": "q<em?>pah", "gloss": "<AF>工作", "meaning": "工作"},
-    "qhuni": {"morph": "qhuni", "gloss": "樹", "meaning": "樹木"},
-    "qita": {"morph": "qita", "gloss": "看", "meaning": "看"},
-    "qmpahan": {"morph": "qmpah-an", "gloss": "田", "meaning": "田地"},
-    "qowlit": {"morph": "qowlit", "gloss": "鼠", "meaning": "老鼠"},
-    "qsiya": {"morph": "qsiya", "gloss": "水", "meaning": "水"},
-    "qsurux": {"morph": "qsurux", "gloss": "魚", "meaning": "魚"},
-    "quwaq": {"morph": "quwaq", "gloss": "嘴", "meaning": "嘴巴"},
-    "quyu": {"morph": "quyu", "gloss": "蛇", "meaning": "蛇"},
-    "rapit": {"morph": "rapit", "gloss": "飛鼠", "meaning": "飛鼠"},
-    "rbagan": {"morph": "rbagan", "gloss": "夏天", "meaning": "夏天"},
-    "risaw": {"morph": "risaw", "gloss": "青年", "meaning": "男青年"},
-    "ruwan": {"morph": "ruwan", "gloss": "裡面", "meaning": "裡面"},
-    "samat": {"morph": "samat", "gloss": "獵物", "meaning": "野獸/獵物"},
-    "sapah": {"morph": "sapah", "gloss": "家", "meaning": "家/房子"},
-    "sapuh": {"morph": "sapuh", "gloss": "藥", "meaning": "藥"},
-    "sari": {"morph": "sari", "gloss": "芋頭", "meaning": "芋頭"},
-    "senaw": {"morph": "senaw", "gloss": "男人", "meaning": "男人"},
-    "shiga": {"morph": "shiga", "gloss": "昨天", "meaning": "昨天"},
-    "shungi": {"morph": "shungi", "gloss": "忘記", "meaning": "忘記"},
-    "sibus": {"morph": "sibus", "gloss": "甘蔗", "meaning": "甘蔗"},
-    "sinaw": {"morph": "sinaw", "gloss": "酒", "meaning": "酒"},
-    "siyang": {"morph": "siyang", "gloss": "豬肉", "meaning": "肥豬肉"},
-    "siyaw": {"morph": "siyaw", "gloss": "旁邊", "meaning": "旁邊"},
-    "swai": {"morph": "swai", "gloss": "弟妹", "meaning": "弟弟/妹妹"},
-    "tama": {"morph": "tama", "gloss": "父親", "meaning": "父親"},
-    "tduwa": {"morph": "tduwa", "gloss": "可以", "meaning": "可以"},
-    "teru": {"morph": "teru", "gloss": "三", "meaning": "三"},
-    "trima": {"morph": "trima", "gloss": "洗澡", "meaning": "洗澡"},
-    "truma": {"morph": "truma", "gloss": "下面", "meaning": "下面"},
-    "tunux": {"morph": "tunux", "gloss": "頭", "meaning": "頭"},
-    "uri": {"morph": "uri", "gloss": "也", "meaning": "也"},
-    "utux": {"morph": "utux", "gloss": "靈", "meaning": "神/鬼/祖靈"},
-    "uwa": {"morph": "uwa", "gloss": "少女", "meaning": "女青年"},
-    "uyas": {"morph": "uyas", "gloss": "歌", "meaning": "歌"},
-    "yayung": {"morph": "yayung", "gloss": "河", "meaning": "河流"}
-}
+    "dgiyaq": { "morph": "dgiyaq", "gloss": "山", "meaning": "山" },
+    "dmuuy": { "morph": "d<m>uuy", "gloss": "<主事焦點>拿", "meaning": "拿著/使用" },
+    "dowriq": { "morph": "dowriq", "gloss": "眼睛", "meaning": "眼睛" },
+    "dqeras": { "morph": "dqeras", "gloss": "臉", "meaning": "臉" },
+    "dxegal": { "morph": "dxegal", "gloss": "地", "meaning": "土地" },
+    "elug": { "morph": "elug", "gloss": "路", "meaning": "道路" },
+    "empitu": { "morph": "empitu", "gloss": "七", "meaning": "七" },
+    "empgu": { "morph": "emp-gu", "gloss": "FUT-發芽", "meaning": "發芽" },
+    "empusal": { "morph": "empusal", "gloss": "二十", "meaning": "二十" },
+    "emptgesa": { "morph": "emp-tgesa", "gloss": "AF-教", "meaning": "老師" },
+    "gamil": { "morph": "gamil", "gloss": "根", "meaning": "根" },
+    "gbiyan": { "morph": "gbiyan", "gloss": "傍晚", "meaning": "傍晚" },
+    "gsilung": { "morph": "gsilung", "gloss": "海", "meaning": "海" },
+    "hakaw": { "morph": "hakaw", "gloss": "橋", "meaning": "橋樑" },
+    "hangan": { "morph": "hangan", "gloss": "名字", "meaning": "名字" },
+    "hici": { "morph": "hici", "gloss": "以後", "meaning": "以後" },
+    "hidaw": { "morph": "hidaw", "gloss": "太陽", "meaning": "太陽" },
+    "hini": { "morph": "hini", "gloss": "這裡", "meaning": "這裡" },
+    "hiyi": { "morph": "hiyi", "gloss": "身體/肉", "meaning": "身體/肉" },
+    "hmuya": { "morph": "h<m>uya", "gloss": "<AF>如何", "meaning": "為什麼/如何" },
+    "hnici": { "morph": "h<en>ici", "gloss": "<PFV>留下", "meaning": "留下" },
+    "hngkawas": { "morph": "hngkawas", "gloss": "年", "meaning": "年/歲" },
+    "huling": { "morph": "huling", "gloss": "狗", "meaning": "狗" },
+    "idas": { "morph": "idas", "gloss": "月亮", "meaning": "月亮" },
+    "idaw": { "morph": "idaw", "gloss": "飯", "meaning": "飯" },
+    "ima": { "morph": "ima", "gloss": "誰", "meaning": "誰" },
+    "inu": { "morph": "inu", "gloss": "哪裡", "meaning": "哪裡" },
+    "jiyax": { "morph": "jiyax", "gloss": "日子", "meaning": "日子/時間" },
+    "kacing": { "morph": "kacing", "gloss": "牛", "meaning": "牛" },
+    "kana": { "morph": "kana", "gloss": "全部", "meaning": "全部" },
+    "karat": { "morph": "karat", "gloss": "天空", "meaning": "天空/天氣" },
+    "kari": { "morph": "kari", "gloss": "話", "meaning": "語言/話" },
+    "keeman": { "morph": "keeman", "gloss": "晚上", "meaning": "晚上" },
+    "kerig": { "morph": "kerig", "gloss": "苧麻", "meaning": "苧麻" },
+    "kingal": { "morph": "kingal", "gloss": "一", "meaning": "一" },
+    "kjiyax": { "morph": "kjiyax", "gloss": "常常", "meaning": "天天/常常" },
+    "kmari": { "morph": "k<m>ari", "gloss": "<AF>挖", "meaning": "挖掘" },
+    "kndusan": { "morph": "kndusan", "gloss": "生命/生活", "meaning": "生命" },
+    "knuwan": { "morph": "knuwan", "gloss": "何時", "meaning": "什麼時候" },
+    "kuxul": { "morph": "kuxul", "gloss": "喜歡", "meaning": "喜歡/心情" },
+    "kuyuh": { "morph": "kuyuh", "gloss": "女人", "meaning": "女人/妻子" },
+    "lala": { "morph": "lala", "gloss": "多", "meaning": "很多" },
+    "laqi": { "morph": "laqi", "gloss": "小孩", "meaning": "小孩" },
+    "lukus": { "morph": "lukus", "gloss": "衣服", "meaning": "衣服" },
+    "lupung": { "morph": "lupung", "gloss": "朋友", "meaning": "朋友" },
+    "mangal": { "morph": "m-angal", "gloss": "AF-拿", "meaning": "拿取" },
+    "marig": { "morph": "m-arig", "gloss": "AF-買", "meaning": "買" },
+    "matas": { "morph": "m-atas", "gloss": "AF-寫", "meaning": "寫/讀書" },
+    "maxal": { "morph": "maxal", "gloss": "十", "meaning": "十" },
+    "mbanah": { "morph": "m-banah", "gloss": "AF-紅", "meaning": "紅色" },
+    "mdrumut": { "morph": "m-drumut", "gloss": "AF-勤勞", "meaning": "勤勞" },
+    "meniq": { "morph": "m-eniq", "gloss": "AF-在", "meaning": "居住/在" },
+    "mhuqil": { "morph": "m-huqil", "gloss": "AF-死", "meaning": "死亡" },
+    "mhuway": { "morph": "m-huway", "gloss": "AF-慷慨", "meaning": "謝謝/慷慨" },
+    "mirit": { "morph": "mirit", "gloss": "羊", "meaning": "羊" },
+    "miying": { "morph": "m-iying", "gloss": "AF-找", "meaning": "尋找/拜訪" },
+    "mkeray": { "morph": "mkeray", "gloss": "AF-堅固", "meaning": "堅固" },
+    "mkesa": { "morph": "m-kesa", "gloss": "AF-走", "meaning": "走路" },
+    "mnarux": { "morph": "m-narux", "gloss": "AF-病", "meaning": "生病/痛" },
+    "mngungu": { "morph": "m-ngungu", "gloss": "AF-怕", "meaning": "害怕" },
+    "mqaras": { "morph": "m-qaras", "gloss": "AF-樂", "meaning": "高興/快樂" },
+    "mrawa": { "morph": "m-rawa", "gloss": "AF-玩", "meaning": "玩耍" },
+    "msangay": { "morph": "m-sangay", "gloss": "AF-休", "meaning": "休息" },
+    "mtutuy": { "morph": "m-tutuy", "gloss": "AF-起", "meaning": "起床" },
+    "naqih": { "morph": "naqih", "gloss": "壞", "meaning": "不好/壞" },
+    "ngangut": { "morph": "ngangut", "gloss": "外面", "meaning": "外面" },
+    "ngiyaw": { "morph": "ngiyaw", "gloss": "貓", "meaning": "貓" },
+    "paah": { "morph": "paah", "gloss": "從", "meaning": "從" },
+    "pada": { "morph": "pada", "gloss": "山羌", "meaning": "山羌" },
+    "pajiq": { "morph": "pajiq", "gloss": "菜", "meaning": "青菜" },
+    "papak": { "morph": "papak", "gloss": "腳", "meaning": "腳" },
+    "paru": { "morph": "paru", "gloss": "大", "meaning": "大" },
+    "patas": { "morph": "patas", "gloss": "書", "meaning": "書/信" },
+    "pila": { "morph": "pila", "gloss": "錢", "meaning": "錢" },
+    "piya": { "morph": "piya", "gloss": "多少", "meaning": "多少" },
+    "pndakar": { "morph": "p-en-dakar", "gloss": "叮嚀/囑咐", "meaning": "叮嚀" },
+    "prajing": { "morph": "prajing", "gloss": "開始", "meaning": "開始" },
+    "pratu": { "morph": "pratu", "gloss": "碗", "meaning": "碗" },
+    "pucing": { "morph": "pucing", "gloss": "刀", "meaning": "獵刀" },
+    "pusu": { "morph": "pusu", "gloss": "根源", "meaning": "根源/樹根" },
+    "qbsuran": { "morph": "qbsuran", "gloss": "兄姊", "meaning": "哥哥/姊姊" },
+    "qduriq": { "morph": "qduriq", "gloss": "逃", "meaning": "逃跑" },
+    "qempah": { "morph": "q<em?>pah", "gloss": "<AF>工作", "meaning": "工作" },
+    "qhuni": { "morph": "qhuni", "gloss": "樹", "meaning": "樹木" },
+    "qita": { "morph": "qita", "gloss": "看", "meaning": "看" },
+    "qmpahan": { "morph": "qmpah-an", "gloss": "田", "meaning": "田地" },
+    "qowlit": { "morph": "qowlit", "gloss": "鼠", "meaning": "老鼠" },
+    "qpahun": { "morph": "qmpah-un", "gloss": "工作-PF", "meaning": "工作" },
+    "qsiya": { "morph": "qsiya", "gloss": "水", "meaning": "水" },
+    "qsurux": { "morph": "qsurux", "gloss": "魚", "meaning": "魚" },
+    "quwaq": { "morph": "quwaq", "gloss": "嘴", "meaning": "嘴巴" },
+    "quyu": { "morph": "quyu", "gloss": "蛇", "meaning": "蛇" },
+    "rapit": { "morph": "rapit", "gloss": "飛鼠", "meaning": "飛鼠" },
+    "rbagan": { "morph": "rbagan", "gloss": "夏天", "meaning": "夏天" },
+    "risaw": { "morph": "risaw", "gloss": "青年", "meaning": "男青年" },
+    "rudux": { "morph": "rudux", "gloss": "雞", "meaning": "雞" },
+    "ruwan": { "morph": "ruwan", "gloss": "裡面", "meaning": "裡面" },
+    "samat": { "morph": "samat", "gloss": "獵物", "meaning": "野獸/獵物" },
+    "sapah": { "morph": "sapah", "gloss": "家", "meaning": "家/房子" },
+    "sapuh": { "morph": "sapuh", "gloss": "藥", "meaning": "藥" },
+    "sari": { "morph": "sari", "gloss": "芋頭", "meaning": "芋頭" },
+    "seejiq": { "morph": "seejiq", "gloss": "人", "meaning": "人/賽德克" },
+    "senaw": { "morph": "senaw", "gloss": "男人", "meaning": "男人" },
+    "shiga": { "morph": "shiga", "gloss": "昨天", "meaning": "昨天" },
+    "shungi": { "morph": "shungi", "gloss": "忘記", "meaning": "忘記" },
+    "sibus": { "morph": "sibus", "gloss": "甘蔗", "meaning": "甘蔗" },
+    "sinaw": { "morph": "sinaw", "gloss": "酒", "meaning": "酒" },
+    "siyang": { "morph": "siyang", "gloss": "豬肉", "meaning": "肥豬肉" },
+    "siyaw": { "morph": "siyaw", "gloss": "旁邊", "meaning": "旁邊" },
+    "smiling": { "morph": "s-m-iling", "gloss": "AF-問", "meaning": "問" },
+    "smluhay": { "morph": "s<m>luhay", "gloss": "<AF>學", "meaning": "學習" },
+    "smruwa": { "morph": "s<m>ruwa", "gloss": "<AF>答應", "meaning": "答應" },
+    "snduray": { "morph": "snduray", "gloss": "最近", "meaning": "最近" },
+    "sngulun": { "morph": "snegul-un", "gloss": "跟隨/帶領-PF", "meaning": "被跟隨" },
+    "snhiyi": { "morph": "snhiyi", "gloss": "信", "meaning": "相信" },
+    "swai": { "morph": "swai", "gloss": "弟妹", "meaning": "弟弟/妹妹" },
+    "tama": { "morph": "tama", "gloss": "父親", "meaning": "父親" },
+    "tduwa": { "morph": "tduwa", "gloss": "可以", "meaning": "可以" },
+    "teru": { "morph": "teru", "gloss": "三", "meaning": "三" },
+    "tmalang": { "morph": "t<m>alang", "gloss": "<AF>跑", "meaning": "跑" },
+    "tmgesa": { "morph": "t<m>gesa", "gloss": "<AF>教", "meaning": "教導" },
+    "tmgsa": { "morph": "tmgsa", "gloss": "教導", "meaning": "教導" },
+    "tminun": { "morph": "t<m>inun", "gloss": "<AF>織", "meaning": "編織" },
+    "tnpusu": { "morph": "te-ne-pusu", "gloss": "扎根/定居", "meaning": "扎根" },
+    "trima": { "morph": "trima", "gloss": "洗澡", "meaning": "洗澡" },
+    "truku": { "morph": "Truku", "gloss": "太魯閣", "meaning": "太魯閣" },
+    "truma": { "morph": "truma", "gloss": "下面", "meaning": "下面" },
+    "tunux": { "morph": "tunux", "gloss": "頭", "meaning": "頭" },
+    "ungat": { "morph": "ungat", "gloss": "無", "meaning": "沒有" },
+    "uri": { "morph": "uri", "gloss": "也", "meaning": "也" },
+    "utux": { "morph": "utux", "gloss": "靈", "meaning": "神/鬼/祖靈" },
+    "uwa": { "morph": "uwa", "gloss": "少女", "meaning": "女青年" },
+    "uyas": { "morph": "uyas", "gloss": "歌", "meaning": "歌" },
+    "yayung": { "morph": "yayung", "gloss": "河", "meaning": "河流" }
+    }
+  };
 
-# 2. 構詞規則引擎 (Rule-Based)
-# 功能：針對不在字典中的詞彙進行自動拆解
-def analyze_morphology(word):
+  const punctuationRegex = /[.,?!;:，。？！；：]/g;
+
+  // 2. 構詞規則引擎 (Rule-Based)
+  // 功能：針對不在字典中的詞彙進行自動拆解
+  def analyze_morphology(word):
     analysis = {"morph": word, "gloss": "???", "meaning": ""}
     
     # 規則 A: 主事焦點 (AF) - m-, me-, em-
@@ -296,12 +353,12 @@ def call_ai_translation(text, target_lang, gloss_context=""):
     if target_lang == 'truku':
         prompt = f"請將以下中文句子翻譯成太魯閣族語(Truku)。直接給出翻譯後的族語句子即可，不要包含其他解釋或拼音。\n句子：{text}"
     else:
-        # RAG-Chain Prompt: 結構對應 + 語意潤飾
+        # RAG-Chain Prompt: 模擬 NLLB200 的結構對應 + Gemini 語意潤飾
         prompt = f"""
         你是一個精通太魯閣語(Truku)與中文的語言學家。請進行以下翻譯任務：
-        1. **結構對應**：參考提供的 [詞法分析] (Gloss)，理解原句的語法結構（主事/受事焦點、時態、格位）。
+        1. **結構對應 (模擬NLLB200)**：參考提供的 [詞法分析] (Gloss)，理解原句的語法結構（主事/受事焦點、時態、格位）。
         2. **直譯**：先在心中進行詞對詞的直譯。
-        3. **語意優化**：將直譯結果調整為通順的中文，但**嚴格保留原句的焦點與語態**。
+        3. **語意優化 (Gemini)**：將直譯結果調整為通順的中文，但**嚴格保留原句的焦點與語態**。
 
         原文：{text}
         詞法分析參考：{gloss_context}
@@ -374,18 +431,13 @@ if st.button("開始分析", type="primary"):
                     analyzed_words.append({"original": word, "morph": guess["morph"], "gloss": guess["gloss"], "meaning": guess["meaning"]})
 
             # 4. 族語 -> 中文 (AI 翻譯)
-            # 注意：這裡我們僅使用 AI 來翻譯，如果沒有 API Key，則顯示提示
             if not is_chinese:
                 # 組合 Gloss Context 給 AI 參考
                 gloss_context = " ".join([f"{w['original']}({w['gloss']}/{w['meaning']})" for w in analyzed_words if w['gloss'] != "???"])
                 
-                # 呼叫 AI
+                # 呼叫 AI (模擬 NLLB200 + Gemini Refinement)
                 ai_translation = call_ai_translation(source_text, 'chinese', gloss_context)
-                
-                if ai_translation:
-                    translation_text = ai_translation
-                else:
-                    translation_text = "(尚未收錄此句翻譯，AI服務不可用)"
+                translation_text = ai_translation if ai_translation else "(翻譯生成失敗)"
 
             # 5. 顯示結果 - 四行樣式
             st.markdown("### 四行標註分析")
