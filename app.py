@@ -359,6 +359,12 @@ DICTIONARY = {
     # --- Y ---
     "yayu": {"morph": "yayu", "gloss": "名詞", "meaning": "小刀"},
     "yayung": {"morph": "yayung", "gloss": "河", "meaning": "河流"}
+    
+    # --- 補充單字 ---
+    "tmkuy": {"morph": "t<m>kuy", "gloss": "<主事焦點>種", "meaning": "種植/播種"},
+    "tnkuyan": {"morph": "tnkuy-an", "gloss": "田", "meaning": "田地/耕地"},
+    "masu": {"morph": "masu", "gloss": "小米", "meaning": "小米"},
+    "daya": {"morph": "daya", "gloss": "上游/山上", "meaning": "上游/山上"},
 }
 
 # ==========================================
@@ -568,3 +574,4 @@ if st.button("開始分析", type="primary"):
 
 st.markdown("---")
 st.caption("資料來源參考：《太魯閣語語法概論》 | 設計用途：族語教學與語料保存")
+
