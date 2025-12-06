@@ -19,17 +19,17 @@ st.set_page_config(
 # [修正] API Key 設定區塊
 # ==========================================
 # 優先嘗試從 Streamlit Secrets 讀取，若無則顯示側邊欄輸入框
+# ==========================================
+# [修正] API Key 設定區塊
+# ==========================================
+# 優先嘗試從 Streamlit Secrets 讀取，若無則顯示側邊欄輸入框
 try:
     if "GEMINI_API_KEY" in st.secrets:
         apiKey = st.secrets["GEMINI_API_KEY"]
     else:
         apiKey = None
-except Exception as e:
-        # --- 修改開始：讓錯誤顯示在畫面上 ---
-        error_msg = f"API 錯誤詳細資訊: {str(e)}"
-        st.error(error_msg)  # 這會在網頁上顯示紅色的錯誤條
-        # --- 修改結束 ---
-        return None
+except FileNotFoundError:
+    apiKey = None  # 如果找不到 secrets 檔，就先設為 None
 
 # 如果 Secrets 沒抓到，就在側邊欄顯示輸入框
 if not apiKey:
@@ -578,6 +578,7 @@ if st.button("開始分析", type="primary"):
 
 st.markdown("---")
 st.caption("資料來源參考：《太魯閣語語法概論》 | 設計用途：族語教學與語料保存")
+
 
 
 
