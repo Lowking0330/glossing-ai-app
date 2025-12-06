@@ -24,8 +24,12 @@ try:
         apiKey = st.secrets["GEMINI_API_KEY"]
     else:
         apiKey = None
-except FileNotFoundError:
-    apiKey = None
+except Exception as e:
+        # --- 修改開始：讓錯誤顯示在畫面上 ---
+        error_msg = f"API 錯誤詳細資訊: {str(e)}"
+        st.error(error_msg)  # 這會在網頁上顯示紅色的錯誤條
+        # --- 修改結束 ---
+        return None
 
 # 如果 Secrets 沒抓到，就在側邊欄顯示輸入框
 if not apiKey:
@@ -574,5 +578,6 @@ if st.button("開始分析", type="primary"):
 
 st.markdown("---")
 st.caption("資料來源參考：《太魯閣語語法概論》 | 設計用途：族語教學與語料保存")
+
 
 
