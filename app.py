@@ -20,43 +20,46 @@ st.set_page_config(
 # ==========================================
 apiKey = None
 
-# 1. 優先嘗試從 Streamlit Secrets 讀取
 try:
     if "GEMINI_API_KEY" in st.secrets:
         apiKey = st.secrets["GEMINI_API_KEY"]
 except FileNotFoundError:
     pass 
 
-# 2. 如果 Secrets 沒抓到，就在側邊欄顯示輸入框
 if not apiKey:
     with st.sidebar:
         st.markdown("### ⚙️ 系統設定")
         user_api_input = st.text_input("請輸入 Google Gemini API Key", type="password")
         if user_api_input:
             apiKey = user_api_input
-        
         st.caption("ℹ️ 若無 API Key，僅能進行詞法拆解，無法使用整句翻譯。")
         st.markdown("---")
 
-# 3. 在側邊欄顯示目前 Key 的狀態
 with st.sidebar:
     if apiKey:
         st.success(f"✅ API Key 已載入")
-        st.caption("🚀 目前使用模型：gemini-2.5-flash") # 顯示當前模型
+        st.caption("🚀 目前使用模型：gemini-2.5-flash")
     else:
         st.warning("⚠️ 未偵測到 API Key")
 
 # ==========================================
-# 1. 核心字典庫 (整合《語法概論》&《辭典》)
+# 1. 核心字典庫
 # ==========================================
 DICTIONARY = {
-    # --- 補充單字 ---
+    # --- [新增] 針對新範例補充的單字 ---
+    "mtalux": {"morph": "mtalux", "gloss": "熱", "meaning": "熱/燙"},
+    "mring": {"morph": "mring", "gloss": "髒/汗", "meaning": "流汗/髒"},
+    "bhangan": {"morph": "bhangan", "gloss": "聽", "meaning": "聽到/聽聞"},
+    "meiyah": {"morph": "m-iyah", "gloss": "主事焦點-來", "meaning": "來(異體)"},
+    "msa": {"morph": "msa", "gloss": "說", "meaning": "說/如此"},
+    "mlatat": {"morph": "m-latat", "gloss": "主事焦點-出", "meaning": "出門/出去"},
+    "snguhi": {"morph": "snguh-i", "gloss": "忘記-祈使", "meaning": "忘記(別忘)"},
+    
+    # --- 原有單字 ---
     "tmkuy": {"morph": "t<m>kuy", "gloss": "<主事焦點>種", "meaning": "種植/播種"},
     "tnkuyan": {"morph": "tnkuy-an", "gloss": "田", "meaning": "田地/耕地"},
     "masu": {"morph": "masu", "gloss": "小米", "meaning": "小米"},
     "daya": {"morph": "daya", "gloss": "上游/山上", "meaning": "上游/山上"},
-
-    # --- 格位標記與功能詞 ---
     "ka": {"morph": "ka", "gloss": "主格", "meaning": "(主格標記)"},
     "ni": {"morph": "ni", "gloss": "連接詞", "meaning": "和/與"},
     "o": {"morph": "o", "gloss": "主題", "meaning": "(主題標記)"},
@@ -81,25 +84,21 @@ DICTIONARY = {
     "gaga": {"morph": "gaga", "gloss": "進行貌.助動", "meaning": "正在(遠)/在那裡"},
     "mha": {"morph": "mha", "gloss": "未來.助動", "meaning": "將"},
     "naa": {"morph": "naa", "gloss": "助動詞", "meaning": "應該"},
-
-    # --- 代名詞 ---
-    "ku": {"morph": "ku", "gloss": "我.主格", "meaning": "我"},
-    "su": {"morph": "su", "gloss": "你.主格/屬格", "meaning": "你/你的"},
-    "mu": {"morph": "mu", "gloss": "我.屬格", "meaning": "我的"},
-    "na": {"morph": "na", "gloss": "他.屬格", "meaning": "他的/尚未"},
-    "ta": {"morph": "ta", "gloss": "我們.包含.主格", "meaning": "我們(包含)"},
-    "nami": {"morph": "nami", "gloss": "我們.排除.主格/屬格", "meaning": "我們(排除)"},
-    "namu": {"morph": "namu", "gloss": "我們.主格/屬格", "meaning": "你們"},
-    "deha": {"morph": "deha", "gloss": "他們.主格/屬格", "meaning": "他們/二"},
-    "yaku": {"morph": "yaku", "gloss": "我.中性格", "meaning": "我"},
-    "isu": {"morph": "isu", "gloss": "你.中性格", "meaning": "你"},
-    "hiya": {"morph": "hiya", "gloss": "他.中性格", "meaning": "他/她/那裡"},
-    "kenan": {"morph": "kenan", "gloss": "我.斜格", "meaning": "對我/被我"},
-    "sunan": {"morph": "sunan", "gloss": "你.斜格", "meaning": "對你/被你"},
-    "menan": {"morph": "menan", "gloss": "我們.排除.斜格", "meaning": "我們"},
+    "ku": {"morph": "ku", "gloss": "1S.主格", "meaning": "我"},
+    "su": {"morph": "su", "gloss": "2S.主格/屬格", "meaning": "你/你的"},
+    "mu": {"morph": "mu", "gloss": "1S.屬格", "meaning": "我的"},
+    "na": {"morph": "na", "gloss": "3S.屬格", "meaning": "他的/尚未"},
+    "ta": {"morph": "ta", "gloss": "1PL.包含.主格", "meaning": "我們(包含)"},
+    "nami": {"morph": "nami", "gloss": "1PL.排除.主格/屬格", "meaning": "我們(排除)"},
+    "namu": {"morph": "namu", "gloss": "2PL.主格/屬格", "meaning": "你們"},
+    "deha": {"morph": "deha", "gloss": "3PL.主格/屬格", "meaning": "他們/二"},
+    "yaku": {"morph": "yaku", "gloss": "1S.主格(獨立)", "meaning": "我"},
+    "isu": {"morph": "isu", "gloss": "2S.主格(獨立)", "meaning": "你"},
+    "hiya": {"morph": "hiya", "gloss": "3S.主格(獨立)", "meaning": "他/她/那裡"},
+    "kenan": {"morph": "kenan", "gloss": "1S.斜格", "meaning": "對我/被我"},
+    "sunan": {"morph": "sunan", "gloss": "2S.斜格", "meaning": "對你/被你"},
+    "menan": {"morph": "menan", "gloss": "1PL.排除.斜格", "meaning": "我們"},
     "niyi": {"morph": "niyi", "gloss": "指示", "meaning": "這/這個"},
-
-    # --- A ---
     "adas": {"morph": "adas", "gloss": "帶", "meaning": "帶"},
     "aga": {"morph": "aga", "gloss": "弓", "meaning": "弓"},
     "aguh": {"morph": "aguh", "gloss": "來(命令)", "meaning": "來(叫人來)"},
@@ -107,8 +106,6 @@ DICTIONARY = {
     "asi": {"morph": "asi", "gloss": "必須", "meaning": "必須"},
     "asu": {"morph": "asu", "gloss": "船", "meaning": "船"},
     "ayug": {"morph": "ayug", "gloss": "溪流", "meaning": "小溪"},
-
-    # --- B ---
     "babaw": {"morph": "babaw", "gloss": "上面", "meaning": "上面/之後"},
     "babuy": {"morph": "babuy", "gloss": "豬", "meaning": "豬"},
     "baga": {"morph": "baga", "gloss": "手", "meaning": "手"},
@@ -135,12 +132,8 @@ DICTIONARY = {
     "bubung": {"morph": "bubung", "gloss": "名詞", "meaning": "雨傘"},
     "bunga": {"morph": "bunga", "gloss": "地瓜", "meaning": "地瓜"},
     "buwax": {"morph": "buwax", "gloss": "米", "meaning": "米(未煮)"},
-
-    # --- C ---
     "cicih": {"morph": "cicih", "gloss": "一點", "meaning": "一點點/少"},
     "cimu": {"morph": "cimu", "gloss": "鹽", "meaning": "鹽"},
-
-    # --- D ---
     "dara": {"morph": "dara", "gloss": "血", "meaning": "血"},
     "desun": {"morph": "des-un", "gloss": "帶-受事焦點", "meaning": "被帶"},
     "dgiyaq": {"morph": "dgiyaq", "gloss": "山", "meaning": "山"},
@@ -150,23 +143,17 @@ DICTIONARY = {
     "dqeras": {"morph": "dqeras", "gloss": "臉", "meaning": "臉"},
     "durun": {"morph": "duru-un", "gloss": "委託-受事焦點", "meaning": "被委託"},
     "dxegal": {"morph": "dxegal", "gloss": "地", "meaning": "土地"},
-
-    # --- E ---
     "elug": {"morph": "elug", "gloss": "路", "meaning": "道路"},
     "empgu": {"morph": "emp-gu", "gloss": "未來-發芽", "meaning": "發芽"},
     "empitu": {"morph": "empitu", "gloss": "七", "meaning": "七"},
     "empquyux": {"morph": "emp-quyux", "gloss": "未來-雨", "meaning": "將下雨"},
     "emptgesa": {"morph": "emp-tgesa", "gloss": "主事焦點-教", "meaning": "老師"},
     "empusal": {"morph": "empusal", "gloss": "二十", "meaning": "二十"},
-
-    # --- G ---
     "gamil": {"morph": "gamil", "gloss": "根", "meaning": "根"},
     "gaya": {"morph": "gaya", "gloss": "習俗", "meaning": "規範/習俗"},
     "gbiyan": {"morph": "gbiyan", "gloss": "傍晚", "meaning": "傍晚"},
     "gmquring": {"morph": "g<m>quring", "gloss": "<主事焦點>究", "meaning": "研究"},
     "gsilung": {"morph": "gsilung", "gloss": "海", "meaning": "海"},
-
-    # --- H ---
     "hakaw": {"morph": "hakaw", "gloss": "橋", "meaning": "橋樑"},
     "hangan": {"morph": "hangan", "gloss": "名字", "meaning": "名字"},
     "hici": {"morph": "hici", "gloss": "以後", "meaning": "以後"},
@@ -177,17 +164,11 @@ DICTIONARY = {
     "hnici": {"morph": "h<en>ici", "gloss": "<完成貌>留下", "meaning": "留下"},
     "hngkawas": {"morph": "hngkawas", "gloss": "年", "meaning": "年/歲"},
     "huling": {"morph": "huling", "gloss": "狗", "meaning": "狗"},
-
-    # --- I ---
     "idas": {"morph": "idas", "gloss": "月亮", "meaning": "月亮"},
     "idaw": {"morph": "idaw", "gloss": "飯", "meaning": "飯"},
     "ima": {"morph": "ima", "gloss": "誰", "meaning": "誰"},
     "inu": {"morph": "inu", "gloss": "哪裡", "meaning": "哪裡"},
-
-    # --- J ---
     "jiyax": {"morph": "jiyax", "gloss": "日子", "meaning": "日子/時間"},
-
-    # --- K ---
     "kacing": {"morph": "kacing", "gloss": "牛", "meaning": "牛"},
     "kana": {"morph": "kana", "gloss": "全部", "meaning": "全部"},
     "karat": {"morph": "karat", "gloss": "天空", "meaning": "天空/天氣"},
@@ -203,14 +184,10 @@ DICTIONARY = {
     "kskuy": {"morph": "k-sekuy", "gloss": "靜態-冷", "meaning": "冷"},
     "kuxul": {"morph": "kuxul", "gloss": "喜歡", "meaning": "喜歡/心情"},
     "kuyuh": {"morph": "kuyuh", "gloss": "女人", "meaning": "女人/妻子"},
-
-    # --- L ---
     "lala": {"morph": "lala", "gloss": "多", "meaning": "很多"},
     "laqi": {"morph": "laqi", "gloss": "小孩", "meaning": "小孩"},
     "lukus": {"morph": "lukus", "gloss": "衣服", "meaning": "衣服"},
     "lupung": {"morph": "lupung", "gloss": "朋友", "meaning": "朋友"},
-
-    # --- M ---
     "madas": {"morph": "m-adas", "gloss": "主事焦點-帶", "meaning": "攜帶"},
     "maduk": {"morph": "m-aduk", "gloss": "主事焦點-獵", "meaning": "打獵"},
     "mahun": {"morph": "mah-un", "gloss": "喝-受事焦點", "meaning": "要喝的/飲料"},
@@ -245,7 +222,7 @@ DICTIONARY = {
     "mniyah": {"morph": "m<n>iyah", "gloss": "主事焦點<完成>-來", "meaning": "來過"},
     "mnkan": {"morph": "m<n>ekan", "gloss": "主事焦點<完成>-吃", "meaning": "吃過"},
     "mowsa": {"morph": "m-owsa", "gloss": "主事焦點-去(未來)", "meaning": "將去"},
-    "mqaras": {"morph": "m-qaras", "gloss": "主事焦點-快樂", "meaning": "高興/快樂"},
+    "mqaras": {"morph": "m-qaras", "gloss": "主事焦點-樂", "meaning": "高興/快樂"},
     "mrawa": {"morph": "m-rawa", "gloss": "主事焦點-玩", "meaning": "玩耍"},
     "mrengaw": {"morph": "m-rengaw", "gloss": "主事焦點-說", "meaning": "說"},
     "msangay": {"morph": "m-sangay", "gloss": "主事焦點-休", "meaning": "休息"},
@@ -256,17 +233,11 @@ DICTIONARY = {
     "mtaqi": {"morph": "m-taqi", "gloss": "主事焦點-睡", "meaning": "睡覺"},
     "mtutuy": {"morph": "m-tutuy", "gloss": "主事焦點-起", "meaning": "起床"},
     "musa": {"morph": "m-usa", "gloss": "主事焦點-去", "meaning": "去"},
-    "mtalux": {"morph": "m-talux", "gloss": "主事焦點-熱", "meaning": "熱"},
-    "mring": {"morph": "mring", "gloss": "汗", "meaning": "汗"},
-
-    # --- N ---
     "naqih": {"morph": "naqih", "gloss": "壞", "meaning": "不好/壞"},
     "ngangut": {"morph": "ngangut", "gloss": "外面", "meaning": "外面"},
     "ngiyaw": {"morph": "ngiyaw", "gloss": "貓", "meaning": "貓"},
     "nii": {"morph": "nii", "gloss": "這", "meaning": "這"},
     "niiq": {"morph": "niiq", "gloss": "在", "meaning": "在(命令)"},
-
-    # --- P ---
     "paah": {"morph": "paah", "gloss": "從", "meaning": "從"},
     "pada": {"morph": "pada", "gloss": "山羌", "meaning": "山羌"},
     "pajiq": {"morph": "pajiq", "gloss": "菜", "meaning": "青菜"},
@@ -288,8 +259,6 @@ DICTIONARY = {
     "pucing": {"morph": "pucing", "gloss": "名詞", "meaning": "獵刀"},
     "pupu": {"morph": "pupu", "gloss": "斧頭", "meaning": "斧頭"},
     "pusu": {"morph": "pusu", "gloss": "名詞", "meaning": "根源/主要"},
-
-    # --- Q ---
     "qbsuran": {"morph": "qbsuran", "gloss": "兄姊", "meaning": "哥哥/姊姊"},
     "qduriq": {"morph": "qduriq", "gloss": "逃", "meaning": "逃跑"},
     "qempah": {"morph": "q<em?>pah", "gloss": "<主事焦點>工作", "meaning": "工作"},
@@ -306,8 +275,6 @@ DICTIONARY = {
     "qtaan": {"morph": "qta-an", "gloss": "看-處所焦點", "meaning": "被看見/看見之處"},
     "quwaq": {"morph": "quwaq", "gloss": "嘴", "meaning": "嘴巴"},
     "quyu": {"morph": "quyu", "gloss": "蛇", "meaning": "蛇"},
-
-    # --- R ---
     "rapit": {"morph": "rapit", "gloss": "飛鼠", "meaning": "飛鼠"},
     "rbagan": {"morph": "rbagan", "gloss": "夏天", "meaning": "夏天"},
     "risaw": {"morph": "risaw", "gloss": "青年", "meaning": "男青年"},
@@ -319,8 +286,6 @@ DICTIONARY = {
     "rudan": {"morph": "rudan", "gloss": "名詞", "meaning": "老人/祖先"},
     "rudux": {"morph": "rudux", "gloss": "雞", "meaning": "雞"},
     "ruwan": {"morph": "ruwan", "gloss": "裡面", "meaning": "裡面"},
-
-    # --- S ---
     "saman": {"morph": "saman", "gloss": "名詞", "meaning": "明天"},
     "samat": {"morph": "samat", "gloss": "獵物", "meaning": "野獸/獵物"},
     "sapah": {"morph": "sapah", "gloss": "家", "meaning": "家/房子"},
@@ -347,8 +312,6 @@ DICTIONARY = {
     "snhiyi": {"morph": "snhiyi", "gloss": "信", "meaning": "相信"},
     "speriq": {"morph": "speriq", "gloss": "名詞", "meaning": "草"},
     "swai": {"morph": "swai", "gloss": "弟妹", "meaning": "弟弟/妹妹"},
-
-    # --- T ---
     "talang": {"morph": "talang", "gloss": "跑", "meaning": "跑(命令)"},
     "tama": {"morph": "tama", "gloss": "父親", "meaning": "父親"},
     "tasil": {"morph": "tasil", "gloss": "名詞", "meaning": "大石頭"},
@@ -364,8 +327,6 @@ DICTIONARY = {
     "truku": {"morph": "Truku", "gloss": "專有名詞", "meaning": "太魯閣"},
     "truma": {"morph": "truma", "gloss": "下面", "meaning": "下面"},
     "tunux": {"morph": "tunux", "gloss": "頭", "meaning": "頭"},
-
-    # --- U ---
     "uqan": {"morph": "uq-an", "gloss": "吃-處所焦點", "meaning": "吃飯的地方"},
     "uqi": {"morph": "uq-i", "gloss": "吃-祈使", "meaning": "吃(命令)"},
     "uqun": {"morph": "uq-un", "gloss": "吃-受事焦點", "meaning": "要吃的/食物"},
@@ -373,30 +334,25 @@ DICTIONARY = {
     "utux": {"morph": "utux", "gloss": "靈", "meaning": "神/鬼/祖靈"},
     "uwa": {"morph": "uwa", "gloss": "少女", "meaning": "女青年"},
     "uyas": {"morph": "uyas", "gloss": "歌", "meaning": "歌"},
-
-    # --- Y ---
     "yayu": {"morph": "yayu", "gloss": "名詞", "meaning": "小刀"},
     "yayung": {"morph": "yayung", "gloss": "河", "meaning": "河流"}
 }
 
 # ==========================================
-# 2. 構詞規則引擎 (Rule-Based Engine)
+# 2. 構詞規則引擎
 # ==========================================
 def analyze_morphology(word):
     analysis = {"morph": word, "gloss": "???", "meaning": ""}
     
-    # 規則 1: 主事焦點 (AF) 前綴 m-, me-, em-, tm-, km-, sm-
     if re.match(r'^m[a-z]+', word) and not word.startswith("ma"):
         if word.startswith("me"):
             root = word[2:]
             return {"morph": f"me-{root}", "gloss": "主事焦點-", "meaning": "(動詞)"}
         elif word.startswith("m"):
             root = word[1:]
-            # 簡單判斷：若剩餘部分有母音，可能是 m-root
             if any(char in "aeiou" for char in root):
                 return {"morph": f"m-{root}", "gloss": "主事焦點-", "meaning": "(動詞)"}
     
-    # 特殊前綴偵測
     if word.startswith("sm") and len(word) > 3:
          root = word[2:]
          return {"morph": f"s<m>{root}", "gloss": "<主事焦點>", "meaning": "(動詞)"}
@@ -410,34 +366,28 @@ def analyze_morphology(word):
          root = word[2:]
          return {"morph": f"g<m>{root}", "gloss": "<主事焦點>", "meaning": "(動詞)"}
 
-    # 規則 2: 中綴 <m>, <n>
     if len(word) > 3 and word[1] in ['m', 'n'] and word[2] in "aeiou":
         infix = word[1]
         root = word[0] + word[2:]
         gloss = "<主事焦點>" if infix == 'm' else "<完成貌>"
         return {"morph": f"{word[0]}<{infix}>{word[2:]}", "gloss": gloss, "meaning": "(動詞)"}
     
-    # 規則 3: 受事焦點 (PF) -un
     if word.endswith("un"):
         root = word[:-2]
         return {"morph": f"{root}-un", "gloss": "-受事焦點", "meaning": "(被動/未來)"}
 
-    # 規則 4: 處所焦點 (LF) -an
     if word.endswith("an"):
         root = word[:-2]
         return {"morph": f"{root}-an", "gloss": "-處所焦點", "meaning": "(處所/過去)"}
 
-    # 規則 5: 祈使 (IMP) -i
     if word.endswith("i"):
         root = word[:-1]
         return {"morph": f"{root}-i", "gloss": "-祈使", "meaning": "(命令)"}
 
-    # 規則 6: 未來/非實現 (FUT) emp-
     if word.startswith("emp"):
         root = word[3:]
         return {"morph": f"emp-{root}", "gloss": "未來-", "meaning": "將..."}
     
-    # 規則 7: 使動 (Causative) p-, pe-
     if word.startswith("pe"):
         root = word[2:]
         return {"morph": f"pe-{root}", "gloss": "使動-", "meaning": "使..."}
@@ -448,25 +398,19 @@ def analyze_morphology(word):
     return analysis
 
 # ==========================================
-# 3. AI 翻譯 API (Google Gemini) - [設定 gemini-2.5-flash]
+# 3. AI 翻譯 API (gemini-2.5-flash)
 # ==========================================
 def call_ai_translation(text, target_lang, gloss_context=""):
-    # 1. 檢查是否有 Key
     if not apiKey:
         return None
 
-    # 2. 嘗試呼叫 API
     try:
         genai.configure(api_key=apiKey)
-        # ==============================================================
-        # [關鍵設定] 使用偵測到的最新模型 gemini-2.5-flash
-        # ==============================================================
         model = genai.GenerativeModel('gemini-2.5-flash')
 
         if target_lang == 'truku':
             prompt = f"請將以下中文句子翻譯成太魯閣族語(Truku)。直接給出翻譯後的族語句子即可，不要包含其他解釋或拼音。\n句子：{text}"
         else:
-            # RAG-Chain Prompt
             prompt = f"""
             你是一個精通太魯閣語(Truku)與中文的語言學家。請進行以下翻譯任務：
             1. **結構對應 (Structural Alignment)**：參考提供的 [詞法分析] (Gloss)，理解原句的語法結構（主事/受事焦點、時態、格位）。
@@ -483,45 +427,64 @@ def call_ai_translation(text, target_lang, gloss_context=""):
         return response.text.strip()
     
     except Exception as e:
-        # 顯示更具體的錯誤原因
         st.error(f"【API 連線錯誤】錯誤代碼與原因：{str(e)}")
         if "404" in str(e):
              st.warning("⚠️ 發生 404 錯誤，但您的環境已確認支援 2.5-flash。請稍後再試，或嘗試切換為 gemini-2.0-flash。")
         return None
 
 # ==========================================
-# 介面邏輯
+# 介面邏輯 (修正版 - 更新範例按鈕)
 # ==========================================
 
 st.title("太魯閣語構詞分析器 (Pro)")
 st.markdown("---")
 
-# 輸入區
+# 初始化 Session State (讓輸入框能記住變數)
+if "user_input" not in st.session_state:
+    st.session_state["user_input"] = ""
+
+# 定義按鈕的回呼函式
+def set_example_text(text):
+    st.session_state["user_input"] = text
+
+# 定義範例文字
+ex1_text = "Mtalux bi ka hidaw, mring kana ka hiyi mu."
+ex2_text = "Bhangan ka kari o meiyah ka bgihur paru msa."
+ex3_text = "Mlatat su o iya bi snguhi madas bubung."
+
+# 輸入區配置
 col1, col2 = st.columns([3, 1])
+
 with col1:
-    input_text = st.text_area("請輸入句子 (族語或中文)", height=100, placeholder="例：Mkla su rmngaw kari Truku hug?")
+    # 綁定 key 到 session_state
+    input_text = st.text_area("請輸入句子 (族語或中文)", height=100, 
+                              placeholder="例：Mkla su rmngaw kari Truku hug?", 
+                              key="user_input")
+
 with col2:
     st.write("範例：")
-    if st.button("範例 1"):
-        input_text = "Mkla su rmngaw kari Truku hug?"
-    if st.button("範例 2"):
-        input_text = "Mha ku qmita tnkuyan mu masu daya."
+    # 使用 on_click 回呼，點擊時直接更新 State
+    st.button("範例 1", on_click=set_example_text, args=(ex1_text,))
+    st.button("範例 2", on_click=set_example_text, args=(ex2_text,))
+    st.button("範例 3", on_click=set_example_text, args=(ex3_text,))
 
 # 分析按鈕
 if st.button("開始分析", type="primary"):
-    if not input_text:
+    # 從 State 取得最新的輸入值
+    input_content = st.session_state["user_input"]
+    
+    if not input_content:
         st.warning("請輸入文字")
     else:
         with st.spinner("分析中..."):
             # 1. 判斷語言模式
-            is_chinese = any("\u4e00" <= char <= "\u9fff" for char in input_text)
+            is_chinese = any("\u4e00" <= char <= "\u9fff" for char in input_content)
             
-            source_text = input_text
+            source_text = input_content
             translation_text = ""
 
             # 2. 中文 -> 族語 (AI 翻譯)
             if is_chinese:
-                # 若無 Key，必須停止
                 if not apiKey:
                     st.error("您輸入的是中文，需要設定 API Key 才能進行 AI 翻譯。請至側邊欄輸入 Key。")
                     st.stop()
@@ -591,6 +554,3 @@ if st.button("開始分析", type="primary"):
 
 st.markdown("---")
 st.caption("資料來源參考：《太魯閣語語法概論》 | 設計用途：族語教學與語料保存")
-
-
-
