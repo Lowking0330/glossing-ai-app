@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # ==========================================
-# [修正] API Key 設定區塊 (解決 SyntaxError)
+# API Key 設定區塊
 # ==========================================
 apiKey = None
 
@@ -25,7 +25,7 @@ try:
     if "GEMINI_API_KEY" in st.secrets:
         apiKey = st.secrets["GEMINI_API_KEY"]
 except FileNotFoundError:
-    pass # 忽略錯誤，繼續往下執行
+    pass 
 
 # 2. 如果 Secrets 沒抓到，就在側邊欄顯示輸入框
 if not apiKey:
@@ -38,7 +38,7 @@ if not apiKey:
         st.caption("ℹ️ 若無 API Key，僅能進行詞法拆解，無法使用整句翻譯。")
         st.markdown("---")
 
-# 3. [除錯用] 在側邊欄顯示目前 Key 的狀態
+# 3. 在側邊欄顯示目前 Key 的狀態
 with st.sidebar:
     if apiKey:
         st.success(f"✅ API Key 已載入")
@@ -49,7 +49,7 @@ with st.sidebar:
 # 1. 核心字典庫 (整合《語法概論》&《辭典》)
 # ==========================================
 DICTIONARY = {
-    # --- [修正] 補充使用者範例缺少的單字 ---
+    # --- 補充單字 ---
     "tmkuy": {"morph": "t<m>kuy", "gloss": "<主事焦點>種", "meaning": "種植/播種"},
     "tnkuyan": {"morph": "tnkuy-an", "gloss": "田", "meaning": "田地/耕地"},
     "masu": {"morph": "masu", "gloss": "小米", "meaning": "小米"},
@@ -445,7 +445,7 @@ def analyze_morphology(word):
     return analysis
 
 # ==========================================
-# 3. AI 翻譯 API (Google Gemini) - [含詳細錯誤回報]
+# 3. AI 翻譯 API (Google Gemini) - [已修正模型名稱]
 # ==========================================
 def call_ai_translation(text, target_lang, gloss_context=""):
     # 1. 檢查是否有 Key
@@ -455,7 +455,8 @@ def call_ai_translation(text, target_lang, gloss_context=""):
     # 2. 嘗試呼叫 API
     try:
         genai.configure(api_key=apiKey)
-        model = genai.GenerativeModel('gemini-pro')
+        # [重要修正] 舊模型名稱 'gemini-pro' 已被棄用，改為 'gemini-1.5-flash'
+        model = genai.GenerativeModel('gemini-1.5-flash')
 
         if target_lang == 'truku':
             prompt = f"請將以下中文句子翻譯成太魯閣族語(Truku)。直接給出翻譯後的族語句子即可，不要包含其他解釋或拼音。\n句子：{text}"
@@ -477,7 +478,6 @@ def call_ai_translation(text, target_lang, gloss_context=""):
         return response.text.strip()
     
     except Exception as e:
-        # [關鍵修正]：顯示真實錯誤原因
         st.error(f"【API 連線錯誤】錯誤代碼與原因：{str(e)}")
         return None
 
