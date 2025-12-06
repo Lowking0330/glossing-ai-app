@@ -445,7 +445,7 @@ def analyze_morphology(word):
     return analysis
 
 # ==========================================
-# 3. AI 翻譯 API (Google Gemini) - [已修正模型名稱]
+# 3. AI 翻譯 API (Google Gemini) - [使用 gemini-pro]
 # ==========================================
 def call_ai_translation(text, target_lang, gloss_context=""):
     # 1. 檢查是否有 Key
@@ -455,8 +455,8 @@ def call_ai_translation(text, target_lang, gloss_context=""):
     # 2. 嘗試呼叫 API
     try:
         genai.configure(api_key=apiKey)
-        # [重要修正] 舊模型名稱 'gemini-pro' 已被棄用，改為 'gemini-1.5-flash'
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        # [重要修正] 改回最穩定的 'gemini-pro'
+        model = genai.GenerativeModel('gemini-pro')
 
         if target_lang == 'truku':
             prompt = f"請將以下中文句子翻譯成太魯閣族語(Truku)。直接給出翻譯後的族語句子即可，不要包含其他解釋或拼音。\n句子：{text}"
