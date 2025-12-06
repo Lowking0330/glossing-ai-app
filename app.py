@@ -43,12 +43,12 @@ with st.sidebar:
         st.warning("⚠️ 未偵測到 API Key")
 
 # ==========================================
-# 1. 核心字典庫 (使用快取優化載入速度)
+# 1. 核心字典庫 (快取)
 # ==========================================
-@st.cache_data(persist=True)  # <--- [加速關鍵] 只載入一次，之後直接從記憶體讀取
+@st.cache_data(persist=True)
 def get_dictionary():
     return {
-        # --- [新增] 針對新範例補充的單字 ---
+        # --- 新範例單字 ---
         "mtalux": {"morph": "mtalux", "gloss": "熱", "meaning": "熱/燙"},
         "mring": {"morph": "mring", "gloss": "髒/汗", "meaning": "流汗/髒"},
         "bhangan": {"morph": "bhangan", "gloss": "聽", "meaning": "聽到/聽聞"},
@@ -56,7 +56,6 @@ def get_dictionary():
         "msa": {"morph": "msa", "gloss": "說", "meaning": "說/如此"},
         "mlatat": {"morph": "m-latat", "gloss": "主事焦點-出", "meaning": "出門/出去"},
         "snguhi": {"morph": "snguh-i", "gloss": "忘記-祈使", "meaning": "忘記(別忘)"},
-        
         # --- 原有單字 ---
         "tmkuy": {"morph": "t<m>kuy", "gloss": "<主事焦點>種", "meaning": "種植/播種"},
         "tnkuyan": {"morph": "tnkuy-an", "gloss": "田", "meaning": "田地/耕地"},
@@ -339,7 +338,6 @@ def get_dictionary():
         "yayu": {"morph": "yayu", "gloss": "名詞", "meaning": "小刀"},
         "yayung": {"morph": "yayung", "gloss": "河", "meaning": "河流"}
     }
-# 執行函式獲取字典 (如果第一次會跑，之後會從快取拿)
 DICTIONARY = get_dictionary()
 
 # ==========================================
@@ -404,9 +402,8 @@ def analyze_morphology(word):
 # ==========================================
 # 3. AI 翻譯 API (gemini-2.5-flash + 快取加速)
 # ==========================================
-@st.cache_data(show_spinner=False) # <--- [加速關鍵] 同樣的句子不再問 Google
+@st.cache_data(show_spinner=False)
 def call_ai_translation(text, target_lang, gloss_context, api_key):
-    # 注意：這裡把 api_key 當參數傳進來，是為了讓快取能正確運作
     if not api_key:
         return None
 
@@ -433,133 +430,171 @@ def call_ai_translation(text, target_lang, gloss_context, api_key):
         return response.text.strip()
     
     except Exception as e:
-        # 如果是網路問題，我們回傳一個錯誤標記，不要讓快取記住這個錯誤
         return f"ERROR: {str(e)}"
 
 # ==========================================
-# 介面邏輯 (修正版 - 更新範例按鈕)
+# 4. 輔助函式：切分句子 (精準斷句修正版)
+# ==========================================
+def split_sentences(text):
+    # 定義要切割的標點符號： . ? ! (半型優先)
+    # 我們使用 capture group () 來保留標點符號
+    pattern = r'([.?!]+)' 
+    
+    parts = re.split(pattern, text)
+    sentences = []
+    
+    # 手動重組：將 "句子文字" 和 "標點" 黏合
+    # parts 會像這樣: ['Sentence A', '.', ' Sentence B', '.', '']
+    
+    temp_text = ""
+    for part in parts:
+        if not part: continue # 跳過空字串
+        
+        # 檢查這部分是不是純標點
+        if re.match(pattern, part):
+            # 如果是標點，黏到上一段文字後面，並結算為一句
+            temp_text += part
+            sentences.append(temp_text.strip())
+            temp_text = "" # 重置
+        else:
+            # 如果是文字，先暫存
+            temp_text += part
+    
+    # 處理最後可能剩下的文字 (例如最後一句沒標點)
+    if temp_text.strip():
+        sentences.append(temp_text.strip())
+        
+    return sentences
+
+# ==========================================
+# 介面邏輯
 # ==========================================
 
 st.title("太魯閣語構詞分析器 (Pro)")
 st.markdown("---")
 
-# 初始化 Session State (讓輸入框能記住變數)
 if "user_input" not in st.session_state:
     st.session_state["user_input"] = ""
 
-# 定義按鈕的回呼函式
 def set_example_text(text):
     st.session_state["user_input"] = text
 
 # 定義範例文字
-ex1_text = "Mtalux bi ka hidaw, mring kana ka hiyi mu."
+ex1_text = "Mtalux bi ka hidaw. Mring kana ka hiyi mu."
 ex2_text = "Bhangan ka kari o meiyah ka bgihur paru msa."
 ex3_text = "Mlatat su o iya bi snguhi madas bubung."
 
-# 輸入區配置
 col1, col2 = st.columns([3, 1])
 
 with col1:
-    # 綁定 key 到 session_state
     input_text = st.text_area("請輸入句子 (族語或中文)", height=100, 
-                              placeholder="例：Mkla su rmngaw kari Truku hug?", 
+                              placeholder="支援多句輸入，例如：Sentence 1. Sentence 2.", 
                               key="user_input")
 
 with col2:
     st.write("範例：")
-    # 使用 on_click 回呼，點擊時直接更新 State
     st.button("範例 1", on_click=set_example_text, args=(ex1_text,))
     st.button("範例 2", on_click=set_example_text, args=(ex2_text,))
     st.button("範例 3", on_click=set_example_text, args=(ex3_text,))
 
 # 分析按鈕
 if st.button("開始分析", type="primary"):
-    # 從 State 取得最新的輸入值
     input_content = st.session_state["user_input"]
     
     if not input_content:
         st.warning("請輸入文字")
     else:
-        with st.spinner("分析中..."):
-            # 1. 判斷語言模式
-            is_chinese = any("\u4e00" <= char <= "\u9fff" for char in input_content)
+        # --- 切分句子 ---
+        sentence_list = split_sentences(input_content)
+        
+        # 準備收集所有句子的結果 (給 CSV 用)
+        all_csv_data = []
+        all_csv_data.append(["Line", "Content"])
+
+        # 逐句處理
+        for idx, single_sentence in enumerate(sentence_list):
             
-            source_text = input_content
-            translation_text = ""
+            # 顯示句子編號
+            if len(sentence_list) > 1:
+                st.markdown(f"#### 句子 {idx + 1}")
 
-            # 2. 中文 -> 族語 (AI 翻譯)
-            if is_chinese:
-                if not apiKey:
-                    st.error("您輸入的是中文，需要設定 API Key 才能進行 AI 翻譯。請至側邊欄輸入 Key。")
-                    st.stop()
+            with st.spinner(f"分析中... ({idx+1}/{len(sentence_list)})"):
+                # 1. 判斷語言模式
+                is_chinese = any("\u4e00" <= char <= "\u9fff" for char in single_sentence)
                 
-                # 呼叫翻譯 (注意參數多了 apiKey)
-                ai_result = call_ai_translation(source_text, 'truku', "", apiKey)
-                
-                if ai_result and not ai_result.startswith("ERROR:"):
-                    translation_text = source_text
-                    source_text = ai_result
-                else:
-                    st.warning(f"翻譯失敗: {ai_result}")
-                    st.stop()
+                source_text = single_sentence
+                translation_text = ""
 
-            # 3. 構詞分析
-            clean_text = re.sub(r'[.,?!;:，。？！；：]', '', source_text).lower()
-            raw_words = source_text.split()
-            
-            analyzed_words = []
-            for word in raw_words:
-                clean_word = re.sub(r'[.,?!;:，。？！；：]', '', word).lower()
-                if clean_word in DICTIONARY:
-                    data = DICTIONARY[clean_word]
-                    analyzed_words.append({"original": word, "morph": data["morph"], "gloss": data["gloss"], "meaning": data["meaning"]})
-                else:
-                    guess = analyze_morphology(clean_word)
-                    analyzed_words.append({"original": word, "morph": guess["morph"], "gloss": guess["gloss"], "meaning": guess["meaning"]})
-
-            # 4. 族語 -> 中文 (AI 翻譯)
-            if not is_chinese:
-                gloss_context = " ".join([f"{w['original']}({w['gloss']}/{w['meaning']})" for w in analyzed_words if w['gloss'] != "???"])
-                
-                if apiKey:
-                    ai_result = call_ai_translation(source_text, 'chinese', gloss_context, apiKey)
+                # 2. 中文 -> 族語 (AI 翻譯)
+                if is_chinese:
+                    if not apiKey:
+                        st.error("需要 API Key 才能翻譯中文。")
+                        st.stop()
+                    
+                    ai_result = call_ai_translation(source_text, 'truku', "", apiKey)
+                    
                     if ai_result and not ai_result.startswith("ERROR:"):
-                         translation_text = ai_result
+                        translation_text = source_text
+                        source_text = ai_result
                     else:
-                         translation_text = "(翻譯失敗，請查看上方錯誤訊息)"
-                else:
-                    translation_text = "(未設定 API Key，無法使用 AI 整句翻譯)"
+                        st.warning(f"翻譯失敗: {ai_result}")
+                        translation_text = "(翻譯失敗)"
 
-            # 5. 顯示結果 - 四行樣式 (● 開頭)
-            st.markdown("### 四行標註分析")
-            
-            html_output = f"""
-            <div style="font-family: monospace; font-size: 16px; line-height: 1.8; background-color: #f8f9fa; padding: 20px; border-radius: 10px;">
-                <div style="margin-bottom: 8px;"><span style="color: #e11d48; font-weight: bold;">●</span> {' '.join([w['original'] for w in analyzed_words])}</div>
-                <div style="margin-bottom: 8px;"><span style="color: #2563eb; font-weight: bold;">●</span> {' '.join([w['morph'] for w in analyzed_words])}</div>
-                <div style="margin-bottom: 8px;"><span style="color: #059669; font-weight: bold;">●</span> {' '.join([w['gloss'] for w in analyzed_words])}</div>
-                <div style="margin-top: 12px; font-weight: bold; border-top: 1px solid #e5e7eb; padding-top: 8px;"><span style="color: #d97706;">●</span> {translation_text}</div>
-            </div>
-            """
-            st.markdown(html_output, unsafe_allow_html=True)
+                # 3. 構詞分析
+                clean_text = re.sub(r'[.,?!;:，。？！；：]', '', source_text).lower()
+                raw_words = source_text.split()
+                
+                analyzed_words = []
+                for word in raw_words:
+                    clean_word = re.sub(r'[.,?!;:，。？！；：]', '', word).lower()
+                    if clean_word in DICTIONARY:
+                        data = DICTIONARY[clean_word]
+                        analyzed_words.append({"original": word, "morph": data["morph"], "gloss": data["gloss"], "meaning": data["meaning"]})
+                    else:
+                        guess = analyze_morphology(clean_word)
+                        analyzed_words.append({"original": word, "morph": guess["morph"], "gloss": guess["gloss"], "meaning": guess["meaning"]})
 
-            # 6. 匯出功能 (CSV)
-            csv_data = []
-            csv_data.append(["Line", "Content"])
-            csv_data.append(["1", ' '.join([w['original'] for w in analyzed_words])])
-            csv_data.append(["2", ' '.join([w['morph'] for w in analyzed_words])])
-            csv_data.append(["3", ' '.join([w['gloss'] for w in analyzed_words])])
-            csv_data.append(["4", translation_text])
-            
-            df_export = pd.DataFrame(csv_data)
-            csv = df_export.to_csv(index=False, header=False).encode('utf-8-sig')
-            
-            st.download_button(
-                label="匯出 Excel (CSV)",
-                data=csv,
-                file_name='truku_analysis.csv',
-                mime='text/csv',
-            )
+                # 4. 族語 -> 中文 (AI 翻譯)
+                if not is_chinese:
+                    gloss_context = " ".join([f"{w['original']}({w['gloss']}/{w['meaning']})" for w in analyzed_words if w['gloss'] != "???"])
+                    
+                    if apiKey:
+                        ai_result = call_ai_translation(source_text, 'chinese', gloss_context, apiKey)
+                        if ai_result and not ai_result.startswith("ERROR:"):
+                             translation_text = ai_result
+                        else:
+                             translation_text = "(翻譯失敗)"
+                    else:
+                        translation_text = "(未設定 API Key)"
+
+                # 5. 顯示結果 (區塊)
+                html_output = f"""
+                <div style="font-family: monospace; font-size: 16px; line-height: 1.8; background-color: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <div style="margin-bottom: 8px;"><span style="color: #e11d48; font-weight: bold;">●</span> {' '.join([w['original'] for w in analyzed_words])}</div>
+                    <div style="margin-bottom: 8px;"><span style="color: #2563eb; font-weight: bold;">●</span> {' '.join([w['morph'] for w in analyzed_words])}</div>
+                    <div style="margin-bottom: 8px;"><span style="color: #059669; font-weight: bold;">●</span> {' '.join([w['gloss'] for w in analyzed_words])}</div>
+                    <div style="margin-top: 12px; font-weight: bold; border-top: 1px solid #e5e7eb; padding-top: 8px;"><span style="color: #d97706;">●</span> {translation_text}</div>
+                </div>
+                """
+                st.markdown(html_output, unsafe_allow_html=True)
+
+                # 收集 CSV 資料
+                all_csv_data.append([f"Sentence {idx+1} - Line 1", ' '.join([w['original'] for w in analyzed_words])])
+                all_csv_data.append([f"Sentence {idx+1} - Line 2", ' '.join([w['morph'] for w in analyzed_words])])
+                all_csv_data.append([f"Sentence {idx+1} - Line 3", ' '.join([w['gloss'] for w in analyzed_words])])
+                all_csv_data.append([f"Sentence {idx+1} - Line 4", translation_text])
+                all_csv_data.append(["---", "---"]) # 分隔線
+
+        # 6. 匯出功能 (CSV) - 整合所有句子
+        df_export = pd.DataFrame(all_csv_data)
+        csv = df_export.to_csv(index=False, header=False).encode('utf-8-sig')
+        
+        st.download_button(
+            label="匯出 Excel (CSV)",
+            data=csv,
+            file_name='truku_analysis_full.csv',
+            mime='text/csv',
+        )
 
 st.markdown("---")
 st.caption("資料來源參考：《太魯閣語語法概論》 | 設計用途：族語教學與語料保存")
