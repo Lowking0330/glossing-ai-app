@@ -16,9 +16,29 @@ st.set_page_config(
 )
 
 # ==========================================
+# [修正] API Key 設定區塊
+# ==========================================
+# 優先嘗試從 Streamlit Secrets 讀取，若無則顯示側邊欄輸入框
+try:
+    if "GEMINI_API_KEY" in st.secrets:
+        apiKey = st.secrets["GEMINI_API_KEY"]
+    else:
+        apiKey = None
+except FileNotFoundError:
+    apiKey = None
+
+# 如果 Secrets 沒抓到，就在側邊欄顯示輸入框
+if not apiKey:
+    with st.sidebar:
+        st.markdown("### ⚙️ 設定")
+        user_api_input = st.text_input("請輸入 Google Gemini API Key", type="password")
+        if user_api_input:
+            apiKey = user_api_input
+        st.caption("若無 API Key，AI 翻譯功能將無法使用，但仍可進行基本的詞法拆解。")
+
+# ==========================================
 # 1. 核心字典庫 (整合《語法概論》&《辭典》)
 # ==========================================
-# 為了確保不出現重複鍵值錯誤，這裡已經過人工校對與去重
 DICTIONARY = {
     # --- 格位標記與功能詞 ---
     "ka": {"morph": "ka", "gloss": "主格", "meaning": "(主格標記)"},
@@ -410,38 +430,40 @@ def analyze_morphology(word):
     return analysis
 
 # ==========================================
-# 3. AI 翻譯 API (Google Gemini) - 模擬 NLLB + Refinement
+# 3. AI 翻譯 API (Google Gemini) - [修正] 
 # ==========================================
 def call_ai_translation(text, target_lang, gloss_context=""):
-    # 若沒有 API Key 則跳過
+    # 若沒有 API Key 則跳過，避免報錯
     if not apiKey:
         return None
 
-    import google.generativeai as genai
-    genai.configure(api_key=apiKey)
-    model = genai.GenerativeModel('gemini-pro')
-
-    if target_lang == 'truku':
-        prompt = f"請將以下中文句子翻譯成太魯閣族語(Truku)。直接給出翻譯後的族語句子即可，不要包含其他解釋或拼音。\n句子：{text}"
-    else:
-        # RAG-Chain Prompt
-        prompt = f"""
-        你是一個精通太魯閣語(Truku)與中文的語言學家。請進行以下翻譯任務：
-        1. **結構對應 (Structural Alignment)**：參考提供的 [詞法分析] (Gloss)，理解原句的語法結構（主事/受事焦點、時態、格位）。
-        2. **直譯 (Literal Translation)**：先在心中進行詞對詞的直譯。
-        3. **語意優化 (Semantic Refinement)**：將直譯結果調整為通順的中文，但**嚴格保留原句的焦點與語態**（例如：受事焦點句應翻成「被...」或「把...」結構）。
-
-        原文：{text}
-        詞法分析參考：{gloss_context}
-
-        請直接輸出翻譯結果，不要包含任何解釋或前言後語。
-        """
-    
+    # 設定 Key
     try:
+        genai.configure(api_key=apiKey)
+        model = genai.GenerativeModel('gemini-pro')
+
+        if target_lang == 'truku':
+            prompt = f"請將以下中文句子翻譯成太魯閣族語(Truku)。直接給出翻譯後的族語句子即可，不要包含其他解釋或拼音。\n句子：{text}"
+        else:
+            # RAG-Chain Prompt
+            prompt = f"""
+            你是一個精通太魯閣語(Truku)與中文的語言學家。請進行以下翻譯任務：
+            1. **結構對應 (Structural Alignment)**：參考提供的 [詞法分析] (Gloss)，理解原句的語法結構（主事/受事焦點、時態、格位）。
+            2. **直譯 (Literal Translation)**：先在心中進行詞對詞的直譯。
+            3. **語意優化 (Semantic Refinement)**：將直譯結果調整為通順的中文，但**嚴格保留原句的焦點與語態**（例如：受事焦點句應翻成「被...」或「把...」結構）。
+
+            原文：{text}
+            詞法分析參考：{gloss_context}
+
+            請直接輸出翻譯結果，不要包含任何解釋或前言後語。
+            """
+        
         response = model.generate_content(prompt)
         return response.text.strip()
+    
     except Exception as e:
-        st.error(f"AI 翻譯錯誤: {e}")
+        # 在此處不直接使用 st.error，而是回傳 None，讓主程式判斷
+        print(f"AI API Error: {e}")
         return None
 
 # ==========================================
@@ -476,12 +498,17 @@ if st.button("開始分析", type="primary"):
 
             # 2. 中文 -> 族語 (AI 翻譯)
             if is_chinese:
+                # 若無 Key，必須停止，因為中文無法直接查字典分析
+                if not apiKey:
+                    st.error("您輸入的是中文，需要設定 API Key 才能進行 AI 翻譯轉換為族語。")
+                    st.stop()
+                
                 ai_translation = call_ai_translation(source_text, 'truku')
                 if ai_translation:
                     translation_text = source_text
                     source_text = ai_translation
                 else:
-                    st.error("AI 翻譯服務暫時無法使用")
+                    st.error("AI 翻譯服務連線失敗，請檢查 Key 是否正確或額度是否足夠。")
                     st.stop()
 
             # 3. 構詞分析
@@ -501,8 +528,12 @@ if st.button("開始分析", type="primary"):
             # 4. 族語 -> 中文 (AI 翻譯)
             if not is_chinese:
                 gloss_context = " ".join([f"{w['original']}({w['gloss']}/{w['meaning']})" for w in analyzed_words if w['gloss'] != "???"])
-                ai_translation = call_ai_translation(source_text, 'chinese', gloss_context)
-                translation_text = ai_translation if ai_translation else "(翻譯生成失敗)"
+                
+                if apiKey:
+                    ai_translation = call_ai_translation(source_text, 'chinese', gloss_context)
+                    translation_text = ai_translation if ai_translation else "(翻譯生成失敗，請檢查 API Key)"
+                else:
+                    translation_text = "(未設定 API Key，無法顯示 AI 翻譯)"
 
             # 5. 顯示結果 - 四行樣式 (● 開頭)
             st.markdown("### 四行標註分析")
