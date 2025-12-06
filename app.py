@@ -256,6 +256,7 @@ DICTIONARY = {
     "mtaqi": {"morph": "m-taqi", "gloss": "主事焦點-睡", "meaning": "睡覺"},
     "mtutuy": {"morph": "m-tutuy", "gloss": "主事焦點-起", "meaning": "起床"},
     "musa": {"morph": "m-usa", "gloss": "主事焦點-去", "meaning": "去"},
+    "mtalux": {"morph": "m-talux", "gloss": "主事焦點-熱", "meaning": "熱"},
 
     # --- N ---
     "naqih": {"morph": "naqih", "gloss": "壞", "meaning": "不好/壞"},
@@ -589,4 +590,5 @@ if st.button("開始分析", type="primary"):
 
 st.markdown("---")
 st.caption("資料來源參考：《太魯閣語語法概論》 | 設計用途：族語教學與語料保存")
+
 
