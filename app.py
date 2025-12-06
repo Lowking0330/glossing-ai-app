@@ -445,7 +445,7 @@ def analyze_morphology(word):
     return analysis
 
 # ==========================================
-# 3. AI 翻譯 API (Google Gemini) - [使用 gemini-pro]
+# 3. AI 翻譯 API (Google Gemini)
 # ==========================================
 def call_ai_translation(text, target_lang, gloss_context=""):
     # 1. 檢查是否有 Key
@@ -455,8 +455,10 @@ def call_ai_translation(text, target_lang, gloss_context=""):
     # 2. 嘗試呼叫 API
     try:
         genai.configure(api_key=apiKey)
-        # [重要修正] 改回最穩定的 'gemini-pro'
-        model = genai.GenerativeModel('gemini-pro')
+        # ------------------------------------------------------------------
+        # [關鍵修正]：使用 gemini-1.5-flash，並請務必更新 requirements.txt
+        # ------------------------------------------------------------------
+        model = genai.GenerativeModel('gemini-1.5-flash')
 
         if target_lang == 'truku':
             prompt = f"請將以下中文句子翻譯成太魯閣族語(Truku)。直接給出翻譯後的族語句子即可，不要包含其他解釋或拼音。\n句子：{text}"
@@ -479,6 +481,9 @@ def call_ai_translation(text, target_lang, gloss_context=""):
     
     except Exception as e:
         st.error(f"【API 連線錯誤】錯誤代碼與原因：{str(e)}")
+        # 顯示更具體的建議
+        if "404" in str(e) and "models" in str(e):
+             st.warning("⚠️ 檢測到 404 錯誤：這通常是因為您的 requirements.txt 尚未更新。請確認您的 google-generativeai 套件版本大於 0.8.0")
         return None
 
 # ==========================================
