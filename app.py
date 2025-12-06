@@ -83,20 +83,20 @@ DICTIONARY = {
     "naa": {"morph": "naa", "gloss": "助動詞", "meaning": "應該"},
 
     # --- 代名詞 ---
-    "ku": {"morph": "ku", "gloss": "1S.主格", "meaning": "我"},
-    "su": {"morph": "su", "gloss": "2S.主格/屬格", "meaning": "你/你的"},
-    "mu": {"morph": "mu", "gloss": "1S.屬格", "meaning": "我的"},
-    "na": {"morph": "na", "gloss": "3S.屬格", "meaning": "他的/尚未"},
-    "ta": {"morph": "ta", "gloss": "1PL.包含.主格", "meaning": "我們(包含)"},
-    "nami": {"morph": "nami", "gloss": "1PL.排除.主格/屬格", "meaning": "我們(排除)"},
-    "namu": {"morph": "namu", "gloss": "2PL.主格/屬格", "meaning": "你們"},
-    "deha": {"morph": "deha", "gloss": "3PL.主格/屬格", "meaning": "他們/二"},
-    "yaku": {"morph": "yaku", "gloss": "1S.主格(獨立)", "meaning": "我"},
-    "isu": {"morph": "isu", "gloss": "2S.主格(獨立)", "meaning": "你"},
-    "hiya": {"morph": "hiya", "gloss": "3S.主格(獨立)", "meaning": "他/她/那裡"},
-    "kenan": {"morph": "kenan", "gloss": "1S.斜格", "meaning": "對我/被我"},
-    "sunan": {"morph": "sunan", "gloss": "2S.斜格", "meaning": "對你/被你"},
-    "menan": {"morph": "menan", "gloss": "1PL.排除.斜格", "meaning": "我們"},
+    "ku": {"morph": "ku", "gloss": "我.主格", "meaning": "我"},
+    "su": {"morph": "su", "gloss": "你.主格/屬格", "meaning": "你/你的"},
+    "mu": {"morph": "mu", "gloss": "我.屬格", "meaning": "我的"},
+    "na": {"morph": "na", "gloss": "他.屬格", "meaning": "他的/尚未"},
+    "ta": {"morph": "ta", "gloss": "我們.包含.主格", "meaning": "我們(包含)"},
+    "nami": {"morph": "nami", "gloss": "我們.排除.主格/屬格", "meaning": "我們(排除)"},
+    "namu": {"morph": "namu", "gloss": "我們.主格/屬格", "meaning": "你們"},
+    "deha": {"morph": "deha", "gloss": "他們.主格/屬格", "meaning": "他們/二"},
+    "yaku": {"morph": "yaku", "gloss": "我.中性格", "meaning": "我"},
+    "isu": {"morph": "isu", "gloss": "你.中性格", "meaning": "你"},
+    "hiya": {"morph": "hiya", "gloss": "他.中性格", "meaning": "他/她/那裡"},
+    "kenan": {"morph": "kenan", "gloss": "我.斜格", "meaning": "對我/被我"},
+    "sunan": {"morph": "sunan", "gloss": "你.斜格", "meaning": "對你/被你"},
+    "menan": {"morph": "menan", "gloss": "我們.排除.斜格", "meaning": "我們"},
     "niyi": {"morph": "niyi", "gloss": "指示", "meaning": "這/這個"},
 
     # --- A ---
@@ -245,7 +245,7 @@ DICTIONARY = {
     "mniyah": {"morph": "m<n>iyah", "gloss": "主事焦點<完成>-來", "meaning": "來過"},
     "mnkan": {"morph": "m<n>ekan", "gloss": "主事焦點<完成>-吃", "meaning": "吃過"},
     "mowsa": {"morph": "m-owsa", "gloss": "主事焦點-去(未來)", "meaning": "將去"},
-    "mqaras": {"morph": "m-qaras", "gloss": "主事焦點-樂", "meaning": "高興/快樂"},
+    "mqaras": {"morph": "m-qaras", "gloss": "主事焦點-快樂", "meaning": "高興/快樂"},
     "mrawa": {"morph": "m-rawa", "gloss": "主事焦點-玩", "meaning": "玩耍"},
     "mrengaw": {"morph": "m-rengaw", "gloss": "主事焦點-說", "meaning": "說"},
     "msangay": {"morph": "m-sangay", "gloss": "主事焦點-休", "meaning": "休息"},
@@ -589,3 +589,4 @@ if st.button("開始分析", type="primary"):
 
 st.markdown("---")
 st.caption("資料來源參考：《太魯閣語語法概論》 | 設計用途：族語教學與語料保存")
+
