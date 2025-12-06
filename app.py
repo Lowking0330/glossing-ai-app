@@ -288,6 +288,7 @@ DICTIONARY = {
     "sapah": {"morph": "sapah", "gloss": "家", "meaning": "家/房子"},
     "sapuh": {"morph": "sapuh", "gloss": "藥", "meaning": "藥"},
     "sari": {"morph": "sari", "gloss": "芋頭", "meaning": "芋頭"},
+    "saw": {"morph": "saw", "gloss": "像", "meaning": "像/如此"},
     "sayang": {"morph": "sayang", "gloss": "名詞", "meaning": "現在/今天"},
     "seejiq": {"morph": "seejiq", "gloss": "名詞", "meaning": "人/賽德克"},
     "senaw": {"morph": "senaw", "gloss": "男人", "meaning": "男人"},
@@ -353,9 +354,10 @@ def analyze_morphology(word):
             return {"morph": f"me-{root}", "gloss": "主事焦點-", "meaning": "(動詞)"}
         elif word.startswith("m"):
             root = word[1:]
+            # 簡單判斷：若剩餘部分有母音，可能是 m-root
             if any(char in "aeiou" for char in root):
                 return {"morph": f"m-{root}", "gloss": "主事焦點-", "meaning": "(動詞)"}
-
+    
     # 特殊前綴偵測
     if word.startswith("sm") and len(word) > 3:
          root = word[2:]
