@@ -16,34 +16,45 @@ st.set_page_config(
 )
 
 # ==========================================
-# [修正] API Key 設定區塊
+# [修正] API Key 設定區塊 (解決 SyntaxError)
 # ==========================================
-# 優先嘗試從 Streamlit Secrets 讀取，若無則顯示側邊欄輸入框
-# ==========================================
-# [修正] API Key 設定區塊
-# ==========================================
-# 優先嘗試從 Streamlit Secrets 讀取，若無則顯示側邊欄輸入框
+apiKey = None
+
+# 1. 優先嘗試從 Streamlit Secrets 讀取
 try:
     if "GEMINI_API_KEY" in st.secrets:
         apiKey = st.secrets["GEMINI_API_KEY"]
-    else:
-        apiKey = None
 except FileNotFoundError:
-    apiKey = None  # 如果找不到 secrets 檔，就先設為 None
+    pass # 忽略錯誤，繼續往下執行
 
-# 如果 Secrets 沒抓到，就在側邊欄顯示輸入框
+# 2. 如果 Secrets 沒抓到，就在側邊欄顯示輸入框
 if not apiKey:
     with st.sidebar:
-        st.markdown("### ⚙️ 設定")
+        st.markdown("### ⚙️ 系統設定")
         user_api_input = st.text_input("請輸入 Google Gemini API Key", type="password")
         if user_api_input:
             apiKey = user_api_input
-        st.caption("若無 API Key，AI 翻譯功能將無法使用，但仍可進行基本的詞法拆解。")
+        
+        st.caption("ℹ️ 若無 API Key，僅能進行詞法拆解，無法使用整句翻譯。")
+        st.markdown("---")
+
+# 3. [除錯用] 在側邊欄顯示目前 Key 的狀態
+with st.sidebar:
+    if apiKey:
+        st.success(f"✅ API Key 已載入")
+    else:
+        st.warning("⚠️ 未偵測到 API Key")
 
 # ==========================================
 # 1. 核心字典庫 (整合《語法概論》&《辭典》)
 # ==========================================
 DICTIONARY = {
+    # --- [修正] 補充使用者範例缺少的單字 ---
+    "tmkuy": {"morph": "t<m>kuy", "gloss": "<主事焦點>種", "meaning": "種植/播種"},
+    "tnkuyan": {"morph": "tnkuy-an", "gloss": "田", "meaning": "田地/耕地"},
+    "masu": {"morph": "masu", "gloss": "小米", "meaning": "小米"},
+    "daya": {"morph": "daya", "gloss": "上游/山上", "meaning": "上游/山上"},
+
     # --- 格位標記與功能詞 ---
     "ka": {"morph": "ka", "gloss": "主格", "meaning": "(主格標記)"},
     "ni": {"morph": "ni", "gloss": "連接詞", "meaning": "和/與"},
@@ -362,13 +373,7 @@ DICTIONARY = {
 
     # --- Y ---
     "yayu": {"morph": "yayu", "gloss": "名詞", "meaning": "小刀"},
-    "yayung": {"morph": "yayung", "gloss": "河", "meaning": "河流"},
-    
-    # --- 補充單字 ---
-    "tmkuy": {"morph": "t<m>kuy", "gloss": "<主事焦點>種", "meaning": "種植/播種"},
-    "tnkuyan": {"morph": "tnkuy-an", "gloss": "田", "meaning": "田地/耕地"},
-    "masu": {"morph": "masu", "gloss": "小米", "meaning": "小米"},
-    "daya": {"morph": "daya", "gloss": "上游/山上", "meaning": "上游/山上"},
+    "yayung": {"morph": "yayung", "gloss": "河", "meaning": "河流"}
 }
 
 # ==========================================
@@ -440,14 +445,14 @@ def analyze_morphology(word):
     return analysis
 
 # ==========================================
-# 3. AI 翻譯 API (Google Gemini) - [修正] 
+# 3. AI 翻譯 API (Google Gemini) - [含詳細錯誤回報]
 # ==========================================
 def call_ai_translation(text, target_lang, gloss_context=""):
-    # 若沒有 API Key 則跳過，避免報錯
+    # 1. 檢查是否有 Key
     if not apiKey:
         return None
 
-    # 設定 Key
+    # 2. 嘗試呼叫 API
     try:
         genai.configure(api_key=apiKey)
         model = genai.GenerativeModel('gemini-pro')
@@ -472,8 +477,8 @@ def call_ai_translation(text, target_lang, gloss_context=""):
         return response.text.strip()
     
     except Exception as e:
-        # 在此處不直接使用 st.error，而是回傳 None，讓主程式判斷
-        print(f"AI API Error: {e}")
+        # [關鍵修正]：顯示真實錯誤原因
+        st.error(f"【API 連線錯誤】錯誤代碼與原因：{str(e)}")
         return None
 
 # ==========================================
@@ -492,7 +497,7 @@ with col2:
     if st.button("範例 1"):
         input_text = "Mkla su rmngaw kari Truku hug?"
     if st.button("範例 2"):
-        input_text = "Empquyux ka saman da, asi su ka madas bubung."
+        input_text = "Mha ku qmita tnkuyan mu masu daya."
 
 # 分析按鈕
 if st.button("開始分析", type="primary"):
@@ -508,9 +513,9 @@ if st.button("開始分析", type="primary"):
 
             # 2. 中文 -> 族語 (AI 翻譯)
             if is_chinese:
-                # 若無 Key，必須停止，因為中文無法直接查字典分析
+                # 若無 Key，必須停止
                 if not apiKey:
-                    st.error("您輸入的是中文，需要設定 API Key 才能進行 AI 翻譯轉換為族語。")
+                    st.error("您輸入的是中文，需要設定 API Key 才能進行 AI 翻譯。請至側邊欄輸入 Key。")
                     st.stop()
                 
                 ai_translation = call_ai_translation(source_text, 'truku')
@@ -518,7 +523,7 @@ if st.button("開始分析", type="primary"):
                     translation_text = source_text
                     source_text = ai_translation
                 else:
-                    st.error("AI 翻譯服務連線失敗，請檢查 Key 是否正確或額度是否足夠。")
+                    st.warning("翻譯失敗，無法繼續進行構詞分析。")
                     st.stop()
 
             # 3. 構詞分析
@@ -541,9 +546,9 @@ if st.button("開始分析", type="primary"):
                 
                 if apiKey:
                     ai_translation = call_ai_translation(source_text, 'chinese', gloss_context)
-                    translation_text = ai_translation if ai_translation else "(翻譯生成失敗，請檢查 API Key)"
+                    translation_text = ai_translation if ai_translation else "(翻譯失敗，請查看上方紅底錯誤訊息)"
                 else:
-                    translation_text = "(未設定 API Key，無法顯示 AI 翻譯)"
+                    translation_text = "(未設定 API Key，無法使用 AI 整句翻譯)"
 
             # 5. 顯示結果 - 四行樣式 (● 開頭)
             st.markdown("### 四行標註分析")
@@ -578,7 +583,3 @@ if st.button("開始分析", type="primary"):
 
 st.markdown("---")
 st.caption("資料來源參考：《太魯閣語語法概論》 | 設計用途：族語教學與語料保存")
-
-
-
-
