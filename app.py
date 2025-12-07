@@ -480,7 +480,7 @@ def set_example_text(text):
     st.session_state["user_input"] = text
 
 # 定義範例文字
-ex1_text = "Mtalux bi ka hidaw. Mring kana ka hiyi mu."
+ex1_text = "Mtalux bi ka hidaw."
 ex2_text = "Ima hangan na ka qbsuran su kuyuh? Hangan na o Biyang."
 ex3_text = "Mha ta inu ka saman hug? Mkmusa ku malu bi rwaan hiya. Tgeinu ka ssaun ta?"
 
@@ -598,6 +598,7 @@ if st.button("開始分析", type="primary"):
 
 st.markdown("---")
 st.caption("資料來源參考：《太魯閣語語法概論》 | 設計用途：族語教學與語料保存")
+
 
 
 
